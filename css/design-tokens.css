@@ -1,0 +1,263 @@
+/* ==========================================================================
+   DESIGN TOKENS & CSS VARIABLES - F&B COSTING & INVENTORY SYSTEM
+   Theme: Artisanal Tea & Specialty Coffee Studio (Warm Amber & Fresh Matcha)
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Artisanal Tea & BFresh Organic Leaf Green (#15a802 - Letters B, F) */
+  --primary-50: #f0fdf0;
+  --primary-100: #dcfce1;
+  --primary-200: #bbf7c5;
+  --primary-300: #7ee891;
+  --primary-400: #24ae00; /* Fresh Leaf Highlight */
+  --primary-500: #15a802; /* Exact color of letters B, F in BFresh Station logo */
+  --primary-600: #108c02; /* Deep Green Border & Hover */
+  --primary-700: #0e7501; /* Rich Forest Green */
+  --primary-800: #0b5e01;
+  --primary-900: #084801;
+
+  /* Matcha & Fresh Herbs - Synchronized with BFresh Logo Green */
+  --accent-matcha-50: #f0fdf0;
+  --accent-matcha-100: #dcfce1;
+  --accent-matcha-500: #15a802;
+  --accent-matcha-600: #108c02;
+  --accent-matcha-700: #0e7501;
+
+  /* Peach & Fruity Infusion */
+  --accent-peach-500: #f97316;
+  --accent-berry-500: #f43f5e;
+  --accent-taro-500: #8b5cf6;
+
+  /* Neutrals & Surfaces - Dark Mode (Pro Executive Luxury Suite) */
+  --bg-app: #080c16;
+  --bg-sidebar: rgba(10, 15, 26, 0.96);
+  --bg-card: rgba(15, 22, 38, 0.82);
+  --bg-card-solid: #0f1627;
+  --bg-card-hover: rgba(22, 33, 56, 0.92);
+  --bg-input: #0b1120;
+  --bg-input-focus: #121c32;
+  --bg-surface: #0e1526;
+  --bg-surface-elevated: #152038;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-focus: rgba(245, 158, 11, 0.55);
+  --border-highlight: rgba(255, 255, 255, 0.14);
+  --card-inner-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+
+  /* Typography Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #080c16;
+
+  /* Semantic Feedback */
+  --color-success: #15a802;
+  --color-success-bg: rgba(21, 168, 2, 0.12);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-info: #38bdf8;
+  --color-info-bg: rgba(56, 189, 248, 0.12);
+
+  /* Elevation & Shadows (Refined Depth) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 14px 36px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(0, 0, 0, 0.35);
+  --shadow-glow-amber: 0 0 24px rgba(21, 168, 2, 0.28);
+  --shadow-glow-green: 0 0 24px rgba(21, 168, 2, 0.28);
+
+  /* Glassmorphism */
+  --glass-blur: blur(20px);
+  --glass-bg: rgba(12, 18, 32, 0.8);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --trans-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout Constants */
+  --sidebar-width: 250px;
+  --header-height: 64px;
+}
+
+/* Light Theme Variables (when user toggles) */
+[data-theme="light"] {
+  --bg-app: #f4f6fb;
+  --bg-sidebar: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.98);
+  --bg-card-solid: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #f1f5f9;
+  --bg-input-focus: #e2e8f0;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f8fafc;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(217, 119, 6, 0.6);
+  --border-highlight: rgba(0, 0, 0, 0.12);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  /* Enhanced High-Contrast Colors on Light Backgrounds - Unified Logo Green (#15a802) */
+  --primary-400: #24ae00;
+  --primary-500: #15a802;
+  --accent-matcha-500: #15a802;
+  --accent-matcha-600: #108c02;
+  --color-success: #108c02;
+  --color-success-bg: rgba(21, 168, 2, 0.12);
+  --color-warning: #d97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.1);
+  --color-danger: #dc2626;
+  --color-danger-bg: rgba(220, 38, 38, 0.1);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-glow-amber: 0 0 20px rgba(66, 148, 12, 0.15);
+  --shadow-glow-green: 0 0 20px rgba(66, 148, 12, 0.2);
+
+  --glass-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* OLED Midnight Theme (Pure Black #000000 - Battery Saving & Maximum Contrast) */
+[data-theme="oled"] {
+  --bg-app: #000000;
+  --bg-sidebar: #050505;
+  --bg-card: rgba(12, 12, 12, 0.96);
+  --bg-card-solid: #0c0c0c;
+  --bg-card-hover: #141414;
+  --bg-input: #000000;
+  --bg-input-focus: #111111;
+  --bg-surface: #0a0a0a;
+  --bg-surface-elevated: #121212;
+  --border-subtle: rgba(255, 255, 255, 0.14);
+  --border-focus: var(--primary-500);
+  --border-highlight: rgba(255, 255, 255, 0.25);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-inverse: #000000;
+
+  --glass-bg: rgba(5, 5, 5, 0.95);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.9);
+}
+
+/* ==========================================================================
+   BRAND ACCENT PALETTES (THEME ACCENTS FOR F&B GENRES)
+   ========================================================================== */
+
+/* 1. BFresh Station Signature Accent (Màu chữ B, F logo: #15a802) */
+[data-accent="matcha"] {
+  --primary-300: #4ade80;
+  --primary-400: #24ae00;
+  --primary-500: #15a802;
+  --primary-600: #108c02;
+  --primary-700: #0e7501;
+  --accent-matcha-500: #15a802;
+  --accent-matcha-600: #108c02;
+  --border-focus: rgba(21, 168, 2, 0.6);
+  --shadow-glow-amber: 0 0 24px rgba(21, 168, 2, 0.28);
+}
+
+/* 2. Sunset Peach - Trà Đào & Trà Trái Cây Nhiệt Đới */
+[data-accent="peach"] {
+  --primary-400: #fb923c;
+  --primary-500: #f97316;
+  --primary-600: #ea580c;
+  --primary-700: #c2410c;
+  --accent-matcha-500: #f59e0b;
+  --accent-matcha-600: #d97706;
+  --border-focus: rgba(249, 115, 22, 0.6);
+  --shadow-glow-amber: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+/* 3. Specialty Espresso - Cà Phê Rang Xay & Mocha */
+[data-accent="coffee"] {
+  --primary-400: #d97706;
+  --primary-500: #b45309;
+  --primary-600: #92400e;
+  --primary-700: #78350f;
+  --accent-matcha-500: #eab308;
+  --accent-matcha-600: #ca8a04;
+  --border-focus: rgba(180, 83, 9, 0.6);
+  --shadow-glow-amber: 0 0 20px rgba(180, 83, 9, 0.35);
+}
+
+/* 4. Ocean Berry - Hoa Đậu Biếc & Việt Quất */
+[data-accent="berry"] {
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+  --accent-matcha-500: #ec4899;
+  --accent-matcha-600: #db2777;
+  --border-focus: rgba(99, 102, 241, 0.6);
+  --shadow-glow-amber: 0 0 20px rgba(99, 102, 241, 0.35);
+}
+
+/* 5. Cyan Barista - Minimalist Modern Tech */
+[data-accent="cyan"] {
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --accent-matcha-500: #14b8a6;
+  --accent-matcha-600: #0d9488;
+  --border-focus: rgba(14, 165, 233, 0.6);
+  --shadow-glow-amber: 0 0 20px rgba(14, 165, 233, 0.35);
+}
+
+/* ==========================================================================
+   DISPLAY DENSITY (COMFORTABLE VS COMPACT POS)
+   ========================================================================== */
+[data-density="compact"] .kpi-box {
+  padding: 0.85rem 1rem !important;
+}
+
+[data-density="compact"] .table-custom td,
+[data-density="compact"] .table-custom th {
+  padding: 6px 10px !important;
+  font-size: 0.82rem !important;
+}
+
+[data-density="compact"] .btn:not(.btn-sm):not(.btn-icon) {
+  padding: 6px 14px !important;
+  font-size: 0.84rem !important;
+}
+
+[data-density="compact"] .card-header,
+[data-density="compact"] .card-body {
+  padding: 1rem 1.15rem !important;
+}
+
+[data-density="compact"] .rank-card {
+  padding: 0.9rem !important;
+}
+
+/* ==========================================================================
+   FONT SIZE SCALING
+   ========================================================================== */
+html[data-font-size="small"] {
+  font-size: 13px !important;
+}
+
+html[data-font-size="normal"] {
+  font-size: 14px !important;
+}
+
+html[data-font-size="large"] {
+  font-size: 15.5px !important;
+}
+

@@ -1,0 +1,1064 @@
+{
+  "app": "BFRESH_STATION_COST_CALCULATOR",
+  "version": "1.0",
+  "exportDate": "2026-10-14T15:53:27.294Z",
+  "note": "File sao lưu toàn bộ Bảng giá, 5 Mẻ BTP và 7 Món Trà Trái Cây Nhiệt Đới chuẩn R&D của BFresh Station",
+  "masterIngredients": [
+    {
+      "id": "tra_olong",
+      "name": "Trà Olong Nướng Đặc Biệt",
+      "cat": "Trà & Cà Phê",
+      "buyUnit": "kg",
+      "buyPrice": 280000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 280
+    },
+    {
+      "id": "tra_lai",
+      "name": "Trà Lài Hoa Nhài Thơm",
+      "cat": "Trà & Cà Phê",
+      "buyUnit": "kg",
+      "buyPrice": 210000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 210
+    },
+    {
+      "id": "cam_vang",
+      "name": "Cam Vàng Mỹ / Cam Sành Tươi",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 42000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 42
+    },
+    {
+      "id": "tac_tuoi",
+      "name": "Trái tắc / Quất tươi",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 30000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 30
+    },
+    {
+      "id": "puree_oi",
+      "name": "Puree / Mứt ổi hồng Ruby",
+      "cat": "Topping",
+      "buyUnit": "hộp 1kg",
+      "buyPrice": 125000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 125
+    },
+    {
+      "id": "syrup_oi",
+      "name": "Siro ổi hồng",
+      "cat": "Siro & Sốt",
+      "buyUnit": "chai 700ml",
+      "buyPrice": 95000,
+      "baseUnit": "ml",
+      "ratio": 700,
+      "basePrice": 135.7
+    },
+    {
+      "id": "mang_cau",
+      "name": "Thịt mãng cầu xiêm ngâm đường",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "hộp 1kg",
+      "buyPrice": 85000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 85
+    },
+    {
+      "id": "vai_ngam",
+      "name": "Trái vải thiều ngâm đóng hộp",
+      "cat": "Topping",
+      "buyUnit": "hộp 565g",
+      "buyPrice": 45000,
+      "baseUnit": "g",
+      "ratio": 565,
+      "basePrice": 79.6
+    },
+    {
+      "id": "syrup_vai",
+      "name": "Siro vải",
+      "cat": "Siro & Sốt",
+      "buyUnit": "chai 700ml",
+      "buyPrice": 95000,
+      "baseUnit": "ml",
+      "ratio": 700,
+      "basePrice": 135.7
+    },
+    {
+      "id": "syrup_hoa_hong",
+      "name": "Siro hoa hồng cao cấp",
+      "cat": "Siro & Sốt",
+      "buyUnit": "chai 700ml",
+      "buyPrice": 110000,
+      "baseUnit": "ml",
+      "ratio": 700,
+      "basePrice": 157.1
+    },
+    {
+      "id": "syrup_dua_luoi",
+      "name": "Puree / Siro dưa lưới Cantaloupe",
+      "cat": "Siro & Sốt",
+      "buyUnit": "chai 700ml",
+      "buyPrice": 95000,
+      "baseUnit": "ml",
+      "ratio": 700,
+      "basePrice": 135.7
+    },
+    {
+      "id": "nha_dam",
+      "name": "Thạch nha đam giòn",
+      "cat": "Topping",
+      "buyUnit": "túi 1kg",
+      "buyPrice": 38000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 38
+    },
+    {
+      "id": "chanh_day",
+      "name": "Cốt chanh dây tươi (có hạt)",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 45000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 45
+    },
+    {
+      "id": "mat_ong",
+      "name": "Mật ong hoa nhãn nguyên chất",
+      "cat": "Đường & C chai",
+      "buyUnit": "chai 1000ml",
+      "buyPrice": 120000,
+      "baseUnit": "ml",
+      "ratio": 1000,
+      "basePrice": 120
+    },
+    {
+      "id": "sa_cay",
+      "name": "Sả cây tươi đập dập",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 20000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 20
+    },
+    {
+      "id": "mut_xoai",
+      "name": "Mứt xoài tươi miếng / Puree xoài",
+      "cat": "Topping",
+      "buyUnit": "hộp 1kg",
+      "buyPrice": 115000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 115
+    },
+    {
+      "id": "trai_thom",
+      "name": "Trái Thơm / Dứa Tươi",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 25000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 25
+    },
+    {
+      "id": "dau_tay",
+      "name": "Dâu Tây Đà Lạt Tươi",
+      "cat": "Trái Cây Tươi",
+      "buyUnit": "kg",
+      "buyPrice": 95000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 95
+    },
+    {
+      "id": "syrup_dao",
+      "name": "Siro đào",
+      "cat": "Siro & Sốt",
+      "buyUnit": "chai 700ml",
+      "buyPrice": 95000,
+      "baseUnit": "ml",
+      "ratio": 700,
+      "basePrice": 135.7
+    },
+    {
+      "id": "mut_dao",
+      "name": "Mứt đào miếng",
+      "cat": "Topping",
+      "buyUnit": "hộp 1kg",
+      "buyPrice": 135000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 135
+    },
+    {
+      "id": "cf_moc",
+      "name": "Cà phê mộc pha phin",
+      "cat": "Trà & Cà Phê",
+      "buyUnit": "kg",
+      "buyPrice": 160000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 160
+    },
+    {
+      "id": "bot_kem",
+      "name": "Bột kem béo",
+      "cat": "Sữa & Bột",
+      "buyUnit": "kg",
+      "buyPrice": 78000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 78
+    },
+    {
+      "id": "sua_dac",
+      "name": "Sữa đặc",
+      "cat": "Sữa & Bột",
+      "buyUnit": "hộp 1280g",
+      "buyPrice": 65000,
+      "baseUnit": "g",
+      "ratio": 1280,
+      "basePrice": 50.8
+    },
+    {
+      "id": "sua_tuoi",
+      "name": "Sữa tươi không đường",
+      "cat": "Sữa & Bột",
+      "buyUnit": "hộp 1l",
+      "buyPrice": 35000,
+      "baseUnit": "ml",
+      "ratio": 1000,
+      "basePrice": 35
+    },
+    {
+      "id": "tc_den",
+      "name": "Trân châu đen",
+      "cat": "Topping",
+      "buyUnit": "kg",
+      "buyPrice": 48000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 48
+    },
+    {
+      "id": "duong_den",
+      "name": "Đường đen",
+      "cat": "Đường & C chai",
+      "buyUnit": "kg",
+      "buyPrice": 52000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 52
+    },
+    {
+      "id": "duong_nuoc",
+      "name": "Đường nước",
+      "cat": "Đường & C chai",
+      "buyUnit": "chai 1000ml",
+      "buyPrice": 35000,
+      "baseUnit": "ml",
+      "ratio": 1000,
+      "basePrice": 35
+    },
+    {
+      "id": "da_vien",
+      "name": "Đá viên",
+      "cat": "Khác",
+      "buyUnit": "kg",
+      "buyPrice": 3000,
+      "baseUnit": "g",
+      "ratio": 1000,
+      "basePrice": 3
+    },
+    {
+      "id": "kem_cheese",
+      "name": "Kem cheese",
+      "cat": "Topping",
+      "buyUnit": "hộp 500g",
+      "buyPrice": 75000,
+      "baseUnit": "g",
+      "ratio": 500,
+      "basePrice": 150
+    },
+    {
+      "id": "ly_700",
+      "name": "Ly nhựa PP 700ml",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 950,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 950
+    },
+    {
+      "id": "nap_700",
+      "name": "Nắp bằng / nắp tim 700ml",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 480,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 480
+    },
+    {
+      "id": "ly_500",
+      "name": "Ly nhựa PP 500ml",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 850,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 850
+    },
+    {
+      "id": "nap_tim",
+      "name": "Nắp tim đen",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 440,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 440
+    },
+    {
+      "id": "ong_hut_12",
+      "name": "Ống hút phi 12",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 250,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 250
+    },
+    {
+      "id": "tui_t",
+      "name": "Túi chữ T 1 ly",
+      "cat": "Bao Bì",
+      "buyUnit": "cái",
+      "buyPrice": 120,
+      "baseUnit": "cái",
+      "ratio": 1,
+      "basePrice": 120
+    }
+  ],
+  "batchDetailsMap": {
+    "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)": {
+      "id": "btp_0",
+      "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+      "outputQty": 1300,
+      "unit": "ml",
+      "expireHours": 6,
+      "ingredients": [
+        {
+          "name": "Trà Lài Hoa Nhài Thơm",
+          "qty": 40,
+          "unit": "g",
+          "price": 210,
+          "total": 8400,
+          "note": "Ủ trà ở nhiệt độ 85°C trong 10 phút"
+        },
+        {
+          "name": "Nước Sôi Tinh Khiết",
+          "qty": 1200,
+          "unit": "ml",
+          "price": 0,
+          "total": 0,
+          "note": "Nước sôi đạt chuẩn để giữ hương lài"
+        },
+        {
+          "name": "Đá viên sốc nhiệt cốt trà",
+          "qty": 300,
+          "unit": "g",
+          "price": 3,
+          "total": 900,
+          "note": "Lọc bã và cho đá để sốc nhiệt khóa hương"
+        }
+      ]
+    },
+    "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)": {
+      "id": "btp_1",
+      "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+      "outputQty": 1200,
+      "unit": "ml",
+      "expireHours": 6,
+      "ingredients": [
+        {
+          "name": "Trà Olong Nướng Đặc Biệt",
+          "qty": 45,
+          "unit": "g",
+          "price": 280,
+          "total": 12600,
+          "note": "Ủ trà ở nhiệt độ 90°C trong 12 phút"
+        },
+        {
+          "name": "Nước Sôi Tinh Khiết",
+          "qty": 1100,
+          "unit": "ml",
+          "price": 0,
+          "total": 0,
+          "note": "Chiết xuất tinh chất olong"
+        },
+        {
+          "name": "Đá viên sốc nhiệt",
+          "qty": 200,
+          "unit": "g",
+          "price": 3,
+          "total": 600,
+          "note": "Làm nguội nhanh giữ màu vàng kim"
+        }
+      ]
+    },
+    "Nước Đường Pha Nước (Syrup Simple 2:1)": {
+      "id": "btp_2",
+      "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+      "outputQty": 1000,
+      "unit": "ml",
+      "expireHours": 72,
+      "ingredients": [
+        {
+          "name": "Đường cát trắng / Đường nước",
+          "qty": 1000,
+          "unit": "ml",
+          "price": 35,
+          "total": 35000,
+          "note": "Nấu theo tỷ lệ 2 đường : 1 nước"
+        },
+        {
+          "name": "Nước lọc tinh khiết",
+          "qty": 500,
+          "unit": "ml",
+          "price": 0,
+          "total": 0,
+          "note": "Đun sôi nhẹ khuấy tan hoàn toàn"
+        }
+      ]
+    },
+    "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)": {
+      "id": "btp_3",
+      "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+      "outputQty": 400,
+      "unit": "ml",
+      "expireHours": 12,
+      "ingredients": [
+        {
+          "name": "Trái tắc / Quất tươi",
+          "qty": 500,
+          "unit": "g",
+          "price": 30,
+          "total": 15000,
+          "note": "Vắt lấy nước cốt nguyên chất, lọc sạch hạt"
+        },
+        {
+          "name": "Đường nước nguyên chất",
+          "qty": 150,
+          "unit": "ml",
+          "price": 35,
+          "total": 5250,
+          "note": "Hãm độ chua gắt, giữ màu xanh vàng tự nhiên"
+        }
+      ]
+    },
+    "Kem Cheese Macchiato (Mẻ 600ml)": {
+      "id": "btp_4",
+      "name": "Kem Cheese Macchiato (Mẻ 600ml)",
+      "outputQty": 600,
+      "unit": "ml",
+      "expireHours": 24,
+      "ingredients": [
+        {
+          "name": "Kem cheese",
+          "qty": 200,
+          "unit": "g",
+          "price": 150,
+          "total": 30000,
+          "note": "Tán mịn cùng sữa tươi"
+        },
+        {
+          "name": "Sữa tươi không đường",
+          "qty": 200,
+          "unit": "ml",
+          "price": 35,
+          "total": 7000,
+          "note": "Đánh đều tạo nền"
+        },
+        {
+          "name": "Bột kem béo",
+          "qty": 100,
+          "unit": "g",
+          "price": 78,
+          "total": 7800,
+          "note": "Đánh bông mịn tạo bọt macchiato bồng bềnh"
+        }
+      ]
+    }
+  },
+  "allRecipes": [
+    {
+      "id": "rec_1",
+      "name": "Trà Đào Cam Sả BFresh",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 39000,
+      "isExpanded": true,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+            "qty": 150,
+            "unit": "ml",
+            "price": 11,
+            "note": "Nền trà olong thanh dịu"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 20,
+            "unit": "ml",
+            "price": 35,
+            "note": "Ngọt dịu chuẩn vị"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Siro đào",
+            "qty": 20,
+            "unit": "ml",
+            "price": 135.7,
+            "note": "Hương đào giòn"
+          },
+          {
+            "name": "Mứt đào miếng",
+            "qty": 35,
+            "unit": "g",
+            "price": 135,
+            "note": "2 miếng đào ngâm giòn ngọt"
+          },
+          {
+            "name": "Cam Vàng Mỹ / Cam Sành Tươi",
+            "qty": 40,
+            "unit": "g",
+            "price": 42,
+            "note": "1 lát cam vàng vắt nước + trang trí"
+          },
+          {
+            "name": "Sả cây tươi đập dập",
+            "qty": 10,
+            "unit": "g",
+            "price": 20,
+            "note": "Dầm nhẹ tạo hương sả tự nhiên"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L chuyên trà trái cây"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to hút mứt"
+          },
+          {
+            "name": "Túi chữ T 1 ly",
+            "qty": 1,
+            "unit": "cái",
+            "price": 120,
+            "note": "Túi xách mang đi"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_2",
+      "name": "Trà Ổi Hồng Ruby Hạt Lựu",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 42000,
+      "isExpanded": true,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+            "qty": 140,
+            "unit": "ml",
+            "price": 7.2,
+            "note": "Hương hoa lài tôn vị ổi"
+          },
+          {
+            "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+            "qty": 10,
+            "unit": "ml",
+            "price": 50.6,
+            "note": "Tạo vị chua thanh kích vị giác"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 15,
+            "unit": "ml",
+            "price": 35,
+            "note": "Cân bằng độ chua ngọt"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Puree / Mứt ổi hồng Ruby",
+            "qty": 35,
+            "unit": "g",
+            "price": 125,
+            "note": "Mứt ổi hồng sánh đặc chuẩn vị"
+          },
+          {
+            "name": "Siro ổi hồng",
+            "qty": 15,
+            "unit": "ml",
+            "price": 135.7,
+            "note": "Tạo màu hồng san hô bắt mắt"
+          },
+          {
+            "name": "Thạch nha đam giòn",
+            "qty": 40,
+            "unit": "g",
+            "price": 38,
+            "note": "Topping nha đam giòn sần sật"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_3",
+      "name": "Trà Mãng Cầu Xiêm Tươi Nhiệt Đới",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 42000,
+      "isExpanded": false,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+            "qty": 150,
+            "unit": "ml",
+            "price": 7.2,
+            "note": "Trà lài đậm đà mát lạnh"
+          },
+          {
+            "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+            "qty": 12,
+            "unit": "ml",
+            "price": 50.6,
+            "note": "Chua thanh chống ngấy"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 20,
+            "unit": "ml",
+            "price": 35,
+            "note": "Độ ngọt thanh"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Thịt mãng cầu xiêm ngâm đường",
+            "qty": 60,
+            "unit": "g",
+            "price": 85,
+            "note": "Mãng cầu tươi xé sợi ngâm đường"
+          },
+          {
+            "name": "Muối hồng / Muối tinh",
+            "qty": 0.3,
+            "unit": "g",
+            "price": 0,
+            "note": "Chút xíu muối dằn vị đậm đà"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to hút mãng cầu"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_4",
+      "name": "Trà Vải Hoa Hồng Hoàng Gia",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 45000,
+      "isExpanded": false,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+            "qty": 140,
+            "unit": "ml",
+            "price": 11,
+            "note": "Cốt olong thơm dịu"
+          },
+          {
+            "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+            "qty": 8,
+            "unit": "ml",
+            "price": 50.6,
+            "note": "Hãm ngọt tạo hậu thanh"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 15,
+            "unit": "ml",
+            "price": 35,
+            "note": "Độ ngọt vừa vặn"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Trái vải thiều ngâm đóng hộp",
+            "qty": 45,
+            "unit": "g",
+            "price": 79.6,
+            "note": "3 trái vải giòn mọng nước"
+          },
+          {
+            "name": "Siro vải",
+            "qty": 20,
+            "unit": "ml",
+            "price": 135.7,
+            "note": "Hương vải đậm đà"
+          },
+          {
+            "name": "Siro hoa hồng cao cấp",
+            "qty": 10,
+            "unit": "ml",
+            "price": 157.1,
+            "note": "Hương hoa hồng sang trọng quyến rũ"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_5",
+      "name": "Trà Dưa Lưới Nha Đam BFresh",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 39000,
+      "isExpanded": false,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+            "qty": 140,
+            "unit": "ml",
+            "price": 7.2,
+            "note": "Cốt trà lài êm dịu"
+          },
+          {
+            "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+            "qty": 8,
+            "unit": "ml",
+            "price": 50.6,
+            "note": "Tạo vị chua nhẹ tự nhiên"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 18,
+            "unit": "ml",
+            "price": 35,
+            "note": "Độ ngọt thanh khiết"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Puree / Siro dưa lưới Cantaloupe",
+            "qty": 30,
+            "unit": "ml",
+            "price": 135.7,
+            "note": "Hương dưa lưới tươi mát"
+          },
+          {
+            "name": "Thạch nha đam giòn",
+            "qty": 50,
+            "unit": "g",
+            "price": 38,
+            "note": "Topping thanh nhiệt"
+          },
+          {
+            "name": "Cam Vàng Mỹ / Chanh vàng",
+            "qty": 20,
+            "unit": "g",
+            "price": 0,
+            "note": "1 lát trang trí miệng ly"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_6",
+      "name": "Trà Chanh Dây Kim Quất Mật Ong",
+      "category": "Trà Trái Cây",
+      "size": "Size L (700ml)",
+      "salePrice": 39000,
+      "isExpanded": false,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+            "qty": 140,
+            "unit": "ml",
+            "price": 7.2,
+            "note": "Cốt trà lài tươi mát"
+          },
+          {
+            "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+            "qty": 15,
+            "unit": "ml",
+            "price": 50.6,
+            "note": "Vị quất tươi kích thích vị giác"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 15,
+            "unit": "ml",
+            "price": 35,
+            "note": "Cân bằng độ chua chanh dây"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Cốt chanh dây tươi (có hạt)",
+            "qty": 25,
+            "unit": "g",
+            "price": 45,
+            "note": "Chua đậm đà thơm ngát"
+          },
+          {
+            "name": "Mật ong hoa nhãn nguyên chất",
+            "qty": 20,
+            "unit": "ml",
+            "price": 120,
+            "note": "Ngọt hậu đậm đà mật ong"
+          },
+          {
+            "name": "Tắc tươi cắt đôi nguyên quả",
+            "qty": 15,
+            "unit": "g",
+            "price": 0,
+            "note": "2 quả tắc dầm nhẹ trang trí"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp bằng / nắp tim 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 480,
+            "note": "Nắp đậy"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_7",
+      "name": "Trà Xoài Chanh Leo Macchiato",
+      "category": "Macchiato / Cheese",
+      "size": "Size L (700ml)",
+      "salePrice": 45000,
+      "isExpanded": false,
+      "groups": {
+        "btp": [
+          {
+            "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+            "qty": 130,
+            "unit": "ml",
+            "price": 7.2,
+            "note": "Cốt trà nền thanh khiết"
+          },
+          {
+            "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+            "qty": 15,
+            "unit": "ml",
+            "price": 35,
+            "note": "Độ ngọt tiêu chuẩn"
+          },
+          {
+            "name": "Kem Cheese Macchiato (Mẻ 600ml)",
+            "qty": 45,
+            "unit": "ml",
+            "price": 74.7,
+            "note": "Lớp kem cheese mặn béo phủ mặt"
+          }
+        ],
+        "raw": [
+          {
+            "name": "Mứt xoài tươi miếng / Puree xoài",
+            "qty": 35,
+            "unit": "g",
+            "price": 115,
+            "note": "Xoài chín thơm ngọt lịm"
+          },
+          {
+            "name": "Cốt chanh dây tươi",
+            "qty": 15,
+            "unit": "g",
+            "price": 45,
+            "note": "Chua thanh tạo độ tương phản vị"
+          }
+        ],
+        "pkg": [
+          {
+            "name": "Ly nhựa PP 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 950,
+            "note": "Ly size L"
+          },
+          {
+            "name": "Nắp tim đen 700ml",
+            "qty": 1,
+            "unit": "cái",
+            "price": 440,
+            "note": "Nắp tim uống kem"
+          },
+          {
+            "name": "Ống hút phi 12",
+            "qty": 1,
+            "unit": "cái",
+            "price": 250,
+            "note": "Ống hút to"
+          },
+          {
+            "name": "Túi chữ T 1 ly",
+            "qty": 1,
+            "unit": "cái",
+            "price": 120,
+            "note": "Túi mang đi"
+          }
+        ]
+      }
+    }
+  ]
+}

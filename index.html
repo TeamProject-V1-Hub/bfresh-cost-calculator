@@ -1,0 +1,3645 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BFresh - Hệ Thống Định Lượng Chi Phí Giá Vốn (All-in-One)</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Chuẩn Gốc Của BFresh Station -->
+  <link rel="stylesheet" href="css/design-tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <!-- Chart.js & SheetJS (Chạy 100% Offline không cần mạng) -->
+  <script src="js/chart.umd.min.js"></script>
+  <script src="js/xlsx.full.min.js"></script>
+
+  <style>
+    body { background-color: var(--bg-app, #f8fafc); color: var(--text-primary, #0f172a); font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    .top-header-custom {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand-custom { display: flex; align-items: center; gap: 12px; }
+    .brand-logo-custom {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid var(--primary-500, #15a802);
+      display: flex; align-items: center; justify-content: center;
+      background: #ffffff; overflow: hidden; padding: 2px;
+      box-shadow: 0 2px 6px rgba(21,168,2,0.15);
+    }
+    .brand-logo-custom img { width: 100%; height: 100%; object-fit: contain; }
+    .brand-title-custom { font-size: 16px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+    .brand-badge-custom { background: #15a802; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .brand-sub-custom { font-size: 11.5px; color: #64748b; }
+
+    /* BỘ LỌC VÀ CÔNG CỤ QUẢN LÝ MENU */
+    .menu-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+    }
+    .filter-pills-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-pill-btn {
+      border: 1px solid #e2e8f0; background: #ffffff; color: #475569;
+      padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .filter-pill-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .filter-pill-btn.active {
+      background: #15a802; color: #ffffff; border-color: #15a802;
+      box-shadow: 0 2px 4px rgba(21,168,2,0.2);
+    }
+
+    /* THẺ CARD MÓN (ACCORDION THU GỌN / MỞ RỘNG) */
+    .recipe-box-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      margin-bottom: 18px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .recipe-box-card.is-collapsed { border-color: #e2e8f0; }
+    .recipe-box-card.is-expanded { border-color: #86efac; box-shadow: 0 4px 12px rgba(21,168,2,0.07); }
+
+    .recipe-box-header {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafcff;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .recipe-box-header:hover { background: #f1f8f4; }
+    .recipe-box-card.is-collapsed .recipe-box-header { background: #ffffff; }
+
+    .recipe-box-body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      padding: 20px;
+      align-items: start;
+      border-top: 1px solid #edf2f7;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 1024px) {
+      .recipe-box-body { grid-template-columns: 1fr; }
+    }
+
+    .workspace-header-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .recipe-meta-badges {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11.5px;
+      flex-wrap: wrap;
+    }
+    .recipe-card-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .btn-card-act {
+      font-size: 11.5px;
+      padding: 5px 8px;
+    }
+    .btn-card-toggle {
+      font-weight: 700;
+      color: #15803d;
+    }
+    .menu-toolbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ================= TỐI ƯU GIAO DIỆN DI ĐỘNG & NATIVE ANDROID UX (CHUẨN BẢN WEB MỀM MẠI) ================= */
+    .mobile-bottom-nav {
+      display: none;
+    }
+    .recipe-modal-row {
+      display: grid;
+      grid-template-columns: 1fr 95px 60px 105px 95px 28px;
+      gap: 8px;
+      align-items: center;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .recipe-modal-header-cols {
+      display: grid;
+      grid-template-columns: 1fr 95px 60px 105px 95px 28px;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 85px !important;
+        background-color: #f8fafc;
+      }
+      .top-header-custom {
+        padding: 10px 14px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .brand-custom {
+        gap: 10px;
+      }
+      .brand-logo-custom {
+        width: 38px;
+        height: 38px;
+      }
+      .brand-title-custom {
+        font-size: 15px !important;
+      }
+      .brand-badge-custom {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+      }
+      .brand-sub-custom {
+        display: none !important;
+      }
+      /* Nút header ẩn trên mobile vì đã chuyển xuống Bottom Navigation Bar */
+      .top-header-custom > div:last-child {
+        display: none !important;
+      }
+
+      /* THANH ĐIỀU HƯỚNG DƯỚI ĐÁY (NATIVE BOTTOM DOCK) CHO ANDROID */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+        z-index: 999;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 4px 0;
+        cursor: pointer;
+        color: #64748b;
+        font-family: inherit;
+        touch-action: manipulation;
+        transition: all 0.15s ease;
+      }
+      .mobile-nav-item:active {
+        transform: scale(0.92);
+      }
+      .mobile-nav-item.active {
+        color: #15a802;
+        font-weight: 700;
+      }
+      .mobile-nav-icon {
+        font-size: 20px;
+        line-height: 1.1;
+      }
+      .mobile-nav-label {
+        font-size: 10px;
+        font-weight: 600;
+        margin-top: 2px;
+      }
+      .mobile-nav-item-fab {
+        position: relative;
+        top: -14px;
+      }
+      .mobile-nav-fab-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #15a802 0%, #166534 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        box-shadow: 0 6px 18px rgba(21, 168, 2, 0.45);
+        border: 3.5px solid #ffffff;
+        transition: transform 0.15s ease;
+      }
+      .mobile-nav-fab-btn:active {
+        transform: scale(0.92);
+      }
+
+      main {
+        padding: 0 10px !important;
+        margin: 12px auto !important;
+      }
+      .workspace-header-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .workspace-header-title h2 {
+        font-size: 17px !important;
+      }
+      .workspace-header-title p {
+        font-size: 11.5px !important;
+      }
+      .menu-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .menu-toolbar-actions {
+        display: flex;
+        width: 100%;
+        gap: 6px;
+      }
+      .menu-toolbar-actions .btn {
+        flex: 1;
+        font-size: 11px;
+        padding: 8px 6px;
+        border-radius: 10px;
+        justify-content: center;
+        white-space: nowrap;
+        text-align: center;
+      }
+      .filter-pills-bar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      .filter-pills-bar::-webkit-scrollbar {
+        height: 3px;
+      }
+      .filter-pills-bar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      .filter-pill-btn {
+        flex-shrink: 0;
+        font-size: 11.5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+
+      /* THẺ MÓN CARD TRÊN MOBILE - MỀM MẠI, BO TRÒN 16PX */
+      .recipe-box-card {
+        border-radius: 16px !important;
+        margin-bottom: 14px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+        overflow: hidden;
+      }
+      .recipe-box-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 14px 14px !important;
+        background: #ffffff;
+      }
+      .recipe-box-header:hover {
+        background: #f8fafc;
+      }
+      .recipe-meta-badges {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 11px;
+        flex-wrap: wrap;
+      }
+      .recipe-meta-badges span {
+        border-radius: 8px !important;
+        padding: 3px 8px !important;
+      }
+      .recipe-card-actions {
+        width: 100%;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed #e2e8f0;
+        display: flex;
+        gap: 6px;
+      }
+      .btn-card-act {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 4px !important;
+        font-size: 11.5px !important;
+        border-radius: 8px !important;
+      }
+      .btn-card-toggle {
+        flex: 1.5;
+        font-weight: 700 !important;
+        color: #15803d !important;
+        background: #f0fdf4 !important;
+        border-color: #bbf7d0 !important;
+      }
+      .recipe-box-body {
+        padding: 14px 10px !important;
+        gap: 16px !important;
+      }
+
+      /* CỘT BÁO CÁO CƠ CẤU & BIỂU ĐỒ TRÒN DOUGHNUT TRÊN MOBILE */
+      .cost-report-sidebar {
+        border-radius: 16px !important;
+        padding: 16px !important;
+        background: #fafcff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+        margin-top: 10px;
+      }
+      .donut-wrap {
+        width: 160px !important;
+        height: 160px !important;
+        margin: 6px auto 14px !important;
+      }
+
+      /* MÁY TÍNH SẢN LƯỢNG MẺ (YIELD CALCULATOR) TRÊN MOBILE */
+      .yield-panel-card {
+        border-radius: 16px !important;
+        padding: 14px !important;
+        margin-top: 14px !important;
+      }
+
+      /* MODAL WINDOWS DẠNG BOTTOM-SHEET NATIVE */
+      .app-modal-backdrop {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      .app-modal-window {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 94vh !important;
+        max-height: 94vh !important;
+        border-radius: 24px 24px 0 0 !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25) !important;
+      }
+      .app-modal-header {
+        padding: 14px 18px !important;
+        border-radius: 24px 24px 0 0 !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+      }
+      .app-modal-content {
+        padding: 14px 12px 90px 12px !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .modal-grid-2col, .modal-grid-3col {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+    }
+
+    /* ĐẶC TRỊ MÀN HÌNH ĐIỆN THOẠI (≤ 640px) - BẢNG BIẾN THÀNH THẺ DÒNG MỀM MẠI */
+    @media (max-width: 640px) {
+      .recipe-box-body .table-responsive-wrapper {
+        overflow-x: visible !important;
+      }
+      .recipe-box-body .data-table thead {
+        display: none !important;
+      }
+      .recipe-box-body .data-table,
+      .recipe-box-body .data-table tbody {
+        display: block !important;
+        width: 100% !important;
+      }
+      .recipe-box-body .data-table tr {
+        display: flex !important;
+        flex-direction: column !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+      }
+      .recipe-box-body .data-table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 3px 0 !important;
+        border: none !important;
+        width: 100% !important;
+        text-align: left !important;
+      }
+      .recipe-box-body .data-table td:first-child {
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        margin-bottom: 4px !important;
+        padding-bottom: 5px !important;
+        border-bottom: 1px dashed #f1f5f9 !important;
+        font-size: 13.5px !important;
+      }
+      .recipe-box-body .data-table td:nth-child(2) {
+        font-size: 12px !important;
+        color: #64748b !important;
+      }
+      .recipe-box-body .data-table td:nth-child(3) {
+        font-weight: 800 !important;
+        color: #15803d !important;
+        font-size: 13.5px !important;
+        margin-top: 2px !important;
+      }
+      .recipe-box-body .data-table td:nth-child(3)::before {
+        content: "Thành tiền: " !important;
+        font-size: 11.5px !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+      }
+
+      /* Modal Định Lượng Món Mới */
+      .recipe-modal-header-cols {
+        display: none !important;
+      }
+      .recipe-modal-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        padding: 10px 12px !important;
+        border-radius: 12px !important;
+        border: 1px solid #cbd5e1 !important;
+        margin-bottom: 8px !important;
+      }
+      .recipe-modal-row .row-part-grid {
+        display: flex !important;
+        width: 100% !important;
+        gap: 6px !important;
+        align-items: center !important;
+      }
+
+      /* Modal Bảng Giá Nguyên Liệu */
+      #tablePriceListMain thead {
+        display: none !important;
+      }
+      #tablePriceListMain, #tbodyPriceList {
+        display: block !important;
+        width: 100% !important;
+      }
+      #tbodyPriceList tr {
+        display: flex !important;
+        flex-direction: column !important;
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 10px 12px !important;
+        margin-bottom: 10px !important;
+        gap: 5px !important;
+      }
+      #tbodyPriceList td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 3px 0 !important;
+        border: none !important;
+        width: 100% !important;
+      }
+      #tbodyPriceList td input, #tbodyPriceList td select {
+        max-width: 65% !important;
+        border-radius: 8px !important;
+        padding: 5px 8px !important;
+      }
+      #tbodyPriceList td:nth-child(1)::before { content: "Nguyên liệu:"; font-weight:700; font-size:11.5px; color:#64748b; }
+      #tbodyPriceList td:nth-child(2)::before { content: "Danh mục:"; font-weight:600; font-size:11px; color:#64748b; }
+      #tbodyPriceList td:nth-child(3)::before { content: "Đơn vị mua:"; font-weight:600; font-size:11px; color:#64748b; }
+      #tbodyPriceList td:nth-child(4)::before { content: "Giá nhập:"; font-weight:600; font-size:11px; color:#64748b; }
+      #tbodyPriceList td:nth-child(5)::before { content: "Quy đổi:"; font-weight:600; font-size:11px; color:#64748b; }
+      #tbodyPriceList td:nth-child(6) { justify-content: flex-end !important; }
+    }
+
+    /* NHÓM NGUYÊN LIỆU */
+    .ing-group { margin-bottom: 18px; }
+    .ing-group-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 6px; border-bottom: 2px solid #f1f5f9; margin-bottom: 8px;
+    }
+    .ing-group-title { font-size: 13px; font-weight: 800; }
+    .ing-group-title.g1 { color: #16a34a; }
+    .ing-group-title.g2 { color: #ea580c; }
+    .ing-group-title.g3 { color: #0284c7; }
+
+    .tag-origin-price {
+      font-size: 11px; color: #64748b; background: #ffffff; border: 1px solid #e2e8f0;
+      padding: 1px 6px; border-radius: 4px; font-weight: 500;
+    }
+    .btn-view-btp {
+      color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; font-size: 11px;
+      padding: 2px 7px; border-radius: 4px; cursor: pointer; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-view-btp:hover { background: #e0f2fe; }
+
+    /* CỘT PHẢI: BÁO CÁO CƠ CẤU & MÁY TÍNH SẢN LƯỢNG */
+    .cost-report-sidebar {
+      background: #fafcff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .donut-wrap { width: 140px; height: 140px; margin: 0 auto 10px; }
+
+    /* MÁY TÍNH PHÂN TÍCH SẢN LƯỢNG (3 TABS) */
+    .yield-panel-card {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 16px;
+    }
+    .yield-tab-strip {
+      display: flex; gap: 4px; background: #e2fbe8; padding: 3px; border-radius: 6px; margin-bottom: 10px;
+    }
+    .yield-tab-item {
+      flex: 1; border: none; padding: 6px 4px; font-size: 11px; font-weight: 700;
+      border-radius: 4px; cursor: pointer; background: transparent; color: #166534; text-align: center;
+      transition: all 0.2s;
+    }
+    .yield-tab-item.active { background: #15a802; color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* CÁC MODAL DIALOGS */
+    .app-modal-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;
+    }
+    .app-modal-backdrop.open { display: flex !important; }
+    .app-modal-window {
+      background: #ffffff; border-radius: 14px; width: 890px; max-width: 95vw;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;
+    }
+    .app-modal-header {
+      padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;
+    }
+    .app-modal-header h3 { font-size: 16px; font-weight: 800; color: #0f172a; margin: 0; }
+    .app-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; font-weight: bold; }
+    .app-modal-content { padding: 20px; overflow-y: auto; flex: 1; }
+
+    /* Combobox datalist helper */
+    .combobox-input {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      padding-right: 24px !important;
+    }
+
+    /* Auto-fill readonly styling */
+    .input-autofill-unit-price {
+      background: #f1f5f9 !important;
+      color: #334155 !important;
+      font-weight: 700 !important;
+      border: 1px solid #cbd5e1 !important;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="top-header-custom">
+    <div class="brand-custom">
+      <div class="brand-logo-custom">
+        <img src="img/bfresh_logo_official.jpg" alt="BFresh Logo">
+      </div>
+      <div>
+        <div class="brand-title-custom">BFRESH STATION <span class="brand-badge-custom">COST CALCULATOR</span></div>
+        <div class="brand-sub-custom">Drink Clean • Stay Refreshed | hệ thống định lượng chi phí giá vốn (All-in-One)</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn btn-secondary btn-sm" onclick="openPriceListModal()">
+        🏷️ Bảng Giá Nguyên Liệu Đầu Vào
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="openBackupRestoreModal()">
+        💾 Sao Lưu & Phục Hồi
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="openNewRecipeModal()">
+        + Tạo món mới
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main style="max-width: 1440px; margin: 20px auto; padding: 0 20px;">
+    
+    <!-- THANH TIÊU ĐỀ WORKSPACE -->
+    <div class="workspace-header-title">
+      <div>
+        <h2 style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0 0 2px 0;">Cost And Benefit Analysis</h2>
+        <p style="font-size: 12.5px; color: #64748b; margin: 0;">
+          Quản trị chuyên sâu chi phí giá vốn (Food Cost) & cấu thành mẻ BTP BFresh.
+        </p>
+      </div>
+      <div>
+        <span style="background:#e0f2fe; color:#0369a1; font-size:11.5px; padding:4px 10px; border-radius:6px; font-weight:700; white-space:nowrap; display:inline-block;" id="badgeTotalRecipesCount">
+          Menu: Đang nạp...
+        </span>
+      </div>
+    </div>
+
+    <!-- THANH BỘ LỌC DANH MỤC & CÔNG CỤ THU GỌN / MỞ RỘNG (ACCORDION TOOLBAR) -->
+    <div class="menu-toolbar">
+      <div class="filter-pills-bar" id="categoryFilterBar">
+        <button class="filter-pill-btn active" data-cat="all" onclick="filterMenuCategory('all')">Tất Cả Món</button>
+        <button class="filter-pill-btn" data-cat="Trà Sữa" onclick="filterMenuCategory('Trà Sữa')">Trà Sữa</button>
+        <button class="filter-pill-btn" data-cat="Trà Trái Cây" onclick="filterMenuCategory('Trà Trái Cây')">Trà Trái Cây</button>
+        <button class="filter-pill-btn" data-cat="Cà Phê" onclick="filterMenuCategory('Cà Phê')">Cà Phê</button>
+        <button class="filter-pill-btn" data-cat="Macchiato / Cheese" onclick="filterMenuCategory('Macchiato / Cheese')">Macchiato / Cheese</button>
+      </div>
+
+      <div class="menu-toolbar-actions">
+        <button class="btn btn-secondary btn-sm" id="btnToggleAllCards" onclick="toggleAllCardsGlobal()">
+          ▴ Thu Gọn
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="openImportRecipeModal()" style="border-color:#15a802; color:#15a802; font-weight:700;">
+          📥 Nạp Công Thức
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="openNewRecipeModal()">
+          + Tạo Món
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= DANH SÁCH CÁC THẺ MÓN MENU (DẠNG ACCORDION) ================= -->
+    <div id="recipeCardsContainer">
+      <!-- Nạp động toàn bộ danh sách các món -->
+    </div>
+
+  </main>
+
+
+  <!-- ================= DATALISTS DÙNG CHUNG (COMBOBOX) ================= -->
+  <datalist id="datalistCategories">
+    <option value="Trà & Cà Phê"></option>
+    <option value="Trái Cây Tươi"></option>
+    <option value="Sữa & Bột"></option>
+    <option value="Topping"></option>
+    <option value="Bao Bì"></option>
+    <option value="Siro & Sốt"></option>
+    <option value="Đường & C gia vị"></option>
+  </datalist>
+
+  <datalist id="datalistUnits">
+    <option value="kg"></option>
+    <option value="hộp 1l"></option>
+    <option value="hộp 1280g"></option>
+    <option value="chai 700ml"></option>
+    <option value="chai 1000ml"></option>
+    <option value="bao 1kg"></option>
+    <option value="gói 500g"></option>
+    <option value="cái"></option>
+  </datalist>
+
+  <datalist id="datalistRecipeGroups">
+    <option value="Trà Sữa"></option>
+    <option value="Trà Trái Cây"></option>
+    <option value="Cà Phê"></option>
+    <option value="Macchiato / Cheese"></option>
+    <option value="Đá Xay / Sinh Tố"></option>
+  </datalist>
+
+  <datalist id="datalistRecipeSizes">
+    <option value="Size M (500ml)"></option>
+    <option value="Size L (700ml)"></option>
+    <option value="Size S (350ml)"></option>
+    <option value="Ly Nóng (400ml)"></option>
+    <option value="Size Khổng Lồ (1000ml)"></option>
+  </datalist>
+
+  <datalist id="datalistRecipeUnits">
+    <option value="ml"></option>
+    <option value="g"></option>
+    <option value="cái"></option>
+    <option value="lát"></option>
+    <option value="muỗng"></option>
+  </datalist>
+
+  <datalist id="datalistMasterIngredients">
+    <!-- Nạp động từ MASTER_INGREDIENTS -->
+  </datalist>
+
+
+  <!-- ================= MODAL 1: CẤU THÀNH BÁN THÀNH PHẨM (MẺ) ================= -->
+  <div class="app-modal-backdrop" id="modalBtpConfig">
+    <div class="app-modal-window" style="width: 760px;">
+      <div class="app-modal-header">
+        <h3 id="modalBtpHeaderTitle">Cấu Thành Bán Thành Phẩm: Nước Cốt Trà Olong</h3>
+        <button class="app-modal-close" onclick="closeBtpModal()">&times;</button>
+      </div>
+      <div class="app-modal-content">
+        <p style="font-size:12px; color:#64748b; margin-bottom:12px;">
+          Định lượng các nguyên liệu thô để nấu 1 mẻ cốt. Đơn giá tự động lấy từ Bảng Giá Gốc. Bạn chỉ cần nhập khối lượng nguyên liệu!
+        </p>
+
+        <!-- HỘP THÔNG TIN GIẢI THÍCH SỰ KHÁC BIỆT GIỮA CẢ MẺ VÀ 1 LY NƯỚC -->
+        <div id="btpModalContextNotice" style="display:none; background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:12.5px; color:#0369a1; line-height:1.55;"></div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;" class="modal-grid-2col">
+          <div>
+            <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">
+              Sản Lượng Cốt Thu Được Sau Nấu (<span id="labelBtpOutputUnit">ml</span>)
+            </label>
+            <input type="number" id="btpOutputQty" class="form-control" value="1100" oninput="recalculateBtpBatch()">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Hạn Dùng / Bảo Quản (Giờ)</label>
+            <input type="number" id="btpExpireHours" class="form-control" value="4">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:12.5px; color:#0f172a;">Các Nguyên Liệu Thô Cấu Thành Mẻ:</strong>
+          <button class="btn btn-secondary btn-sm" onclick="addBtpRowDynamic()" style="color:#15a802; font-weight:700;">+ Thêm Nguyên Liệu Vào Mẻ</button>
+        </div>
+
+        <table class="data-table" style="width:100%; font-size:12.5px;">
+          <thead>
+            <tr>
+              <th style="width:38%;">Nguyên Liệu Thô</th>
+              <th style="width:18%;">Khối Lượng</th>
+              <th style="width:12%;">ĐV</th>
+              <th style="width:16%;">Đơn Giá (đ)</th>
+              <th style="width:16%;">Thành Tiền</th>
+              <th style="width:30px;"></th>
+            </tr>
+          </thead>
+          <tbody id="btpModalRowsTbody">
+            <!-- Nạp động theo mẻ đang chọn -->
+          </tbody>
+        </table>
+
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:#166534; font-weight:600;">TỔNG GIÁ VỐN CẢ MẺ:</div>
+            <div style="font-size:16px; font-weight:800; color:#166534;" id="labelBtpTotalBatch">14.000 đ / 1.100 ml</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:#166534; font-weight:600;">ĐƠN GIÁ CỐT TÍNH VÀO MÓN:</div>
+            <div style="font-size:16px; font-weight:800; color:#15a802;" id="labelBtpUnitCost">12.73 đ / ml</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+          <button class="btn btn-secondary" onclick="closeBtpModal()">Đóng</button>
+          <button class="btn btn-primary" onclick="saveBtpBatchChanges()">Cập Nhật Vào Món</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL 2: TẠO MỚI / CHỈNH SỬA MÓN (NGƯỜI DÙNG CHỈ NHẬP KHỐI LƯỢNG) ================= -->
+  <div class="app-modal-backdrop" id="modalNewRecipeDialog">
+    <div class="app-modal-window" style="width: 890px;">
+      <div class="app-modal-header">
+        <h3 id="modalRecipeFormTitle" style="display:flex; align-items:center; gap:8px;">
+          <img src="img/bfresh_logo_official.jpg" alt="BFresh" style="width:24px; height:24px; border-radius:50%; border:1px solid #15a802;">
+          Thiết Kế Món Menu & Định Lượng Giá Vốn
+        </h3>
+        <button class="app-modal-close" onclick="closeNewRecipeModal()">&times;</button>
+      </div>
+      <div class="app-modal-content">
+        
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:12px; color:#166534;">
+          💡 <strong>Định Lượng Nhanh:</strong> Bạn chỉ cần <strong>nhập duy nhất Cột Khối Lượng</strong>. Hệ thống tự động lấy Đơn Giá từ Bảng Giá Nguyên Liệu Đầu Vào & Công Thức Mẻ để tính ra thành tiền!
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:#ef4444; display:block; margin-bottom:4px;">Tên Món Đồ Uống *</label>
+          <input type="text" id="inputNewRecipeName" class="form-control" placeholder="VD: Trà Đào Cam Sả Tươi (Size L)..." value="Trà Sữa Olong Nướng Trân Châu (Size M)">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px;" class="modal-grid-3col">
+          <div>
+            <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Nhóm Món (Chọn hoặc Gõ mới)</label>
+            <input type="text" list="datalistRecipeGroups" id="selectRecipeGroupDropdown" class="form-control combobox-input" value="Trà Sữa" placeholder="Chọn hoặc nhập nhóm...">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:#ef4444; display:block; margin-bottom:4px;">Size Ly (Chọn hoặc Tự gõ) *</label>
+            <input type="text" list="datalistRecipeSizes" id="selectRecipeSizeDropdown" class="form-control combobox-input" value="Size M (500ml)" placeholder="Chọn hoặc nhập size ly...">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:#ef4444; display:block; margin-bottom:4px;">Giá Bán Tại Quán (VND) *</label>
+            <input type="number" id="inputNewRecipePrice" class="form-control" value="35000" oninput="calcNewRecipeCostAndMargin()">
+          </div>
+        </div>
+
+        <!-- 1. Bán thành phẩm (Mẻ) -->
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#fafcff; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:13px; color:#16a34a;">1. Bán Thành Phẩm (Cốt trà, Trân châu, Nước đường...)</strong>
+            <button class="btn btn-secondary btn-sm" onclick="addNewRecipeRowDynamic('btp')" style="color:#16a34a; font-weight:700;">+ Thêm BTP</button>
+          </div>
+          <div class="recipe-modal-header-cols" style="display:grid; grid-template-columns: 1fr 95px 60px 105px 95px 28px; gap:8px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: #64748b; border-bottom: 1px dashed #cbd5e1; margin-bottom: 6px; text-transform: uppercase;">
+            <div>Tên Bán Thành Phẩm</div>
+            <div style="text-align:center; color:#15803d;">Khối Lượng (Nhập)</div>
+            <div style="text-align:center;">Đơn Vị</div>
+            <div style="text-align:right;">Đơn Giá (Tự Động)</div>
+            <div style="text-align:right;">Thành Tiền</div>
+            <div></div>
+          </div>
+          <div id="boxNewRecipeBtp" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Nạp động -->
+          </div>
+        </div>
+
+        <!-- 2. Nguyên liệu trực tiếp & Trái cây -->
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#fafcff; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:13px; color:#ea580c;">2. Nguyên Liệu Trực Tiếp & Trái Cây</strong>
+            <button class="btn btn-secondary btn-sm" onclick="addNewRecipeRowDynamic('raw')" style="color:#ea580c; font-weight:700;">+ Thêm Nguyên Liệu</button>
+          </div>
+          <div class="recipe-modal-header-cols" style="display:grid; grid-template-columns: 1fr 95px 60px 105px 95px 28px; gap:8px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: #64748b; border-bottom: 1px dashed #cbd5e1; margin-bottom: 6px; text-transform: uppercase;">
+            <div>Tên Nguyên Liệu / Trái Cây</div>
+            <div style="text-align:center; color:#ea580c;">Khối Lượng (Nhập)</div>
+            <div style="text-align:center;">Đơn Vị</div>
+            <div style="text-align:right;">Đơn Giá (Tự Động)</div>
+            <div style="text-align:right;">Thành Tiền</div>
+            <div></div>
+          </div>
+          <div id="boxNewRecipeRaw" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Nạp động -->
+          </div>
+        </div>
+
+        <!-- 3. Vật tư bao bì -->
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#fafcff; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:13px; color:#0284c7;">3. Vật Tư Bao Bì Ly Nắp & Ống Hút</strong>
+            <button class="btn btn-secondary btn-sm" onclick="addNewRecipeRowDynamic('pkg')" style="color:#0284c7; font-weight:700;">+ Thêm Bao Bì</button>
+          </div>
+          <div class="recipe-modal-header-cols" style="display:grid; grid-template-columns: 1fr 95px 60px 105px 95px 28px; gap:8px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: #64748b; border-bottom: 1px dashed #cbd5e1; margin-bottom: 6px; text-transform: uppercase;">
+            <div>Tên Vật Tư Bao Bì</div>
+            <div style="text-align:center; color:#0284c7;">Số Lượng (Nhập)</div>
+            <div style="text-align:center;">Đơn Vị</div>
+            <div style="text-align:right;">Đơn Giá (Tự Động)</div>
+            <div style="text-align:right;">Thành Tiền</div>
+            <div></div>
+          </div>
+          <div id="boxNewRecipePkg" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Nạp động -->
+          </div>
+        </div>
+
+        <!-- Banner tổng kết vốn và biên lãi -->
+        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:#166534; font-weight:700;">TỔNG GIÁ VỐN MÓN:</div>
+            <div style="font-size:20px; font-weight:800; color:#15803d;" id="labelNewRecCost">0 đ</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:#166534; font-weight:700;">BIÊN LÃI GỘP:</div>
+            <div style="font-size:20px; font-weight:800; color:#15803d;" id="labelNewRecMargin">0%</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+          <button class="btn btn-secondary" onclick="closeNewRecipeModal()">Hủy</button>
+          <button class="btn btn-primary" onclick="saveNewRecipeSubmit()">Lưu Món Vào Menu</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL 3: BẢNG GIÁ NGUYÊN LIỆU ĐẦU VÀO ================= -->
+  <div class="app-modal-backdrop" id="modalPriceListDialog">
+    <div class="app-modal-window" style="width: 890px;">
+      <div class="app-modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px;">
+          <img src="img/bfresh_logo_official.jpg" alt="BFresh" style="width:24px; height:24px; border-radius:50%; border:1px solid #15a802;">
+          🏷️ Bảng Giá Nguyên Liệu Đầu Vào (Quản Lý Giá Mua)
+        </h3>
+        <button class="app-modal-close" onclick="closePriceListModal()">&times;</button>
+      </div>
+      <div class="app-modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f0fdf4; padding:10px 14px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:12px;">
+          <div style="font-size:12px; color:#166534;">
+            💡 <strong>Gốc Rễ Giá Vốn:</strong> Toàn bộ dữ liệu được lưu vĩnh viễn trên máy. Khi nạp file thật, bạn có thể chọn "Nạp thay thế toàn bộ" để xóa sạch đồ test mẫu!
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="addNewManualIngredientRow()" style="color:#15a802; font-weight:700;">+ Thêm Thủ Công</button>
+            <button class="btn btn-secondary btn-sm" onclick="downloadPriceTemplateCSV()">📥 Tải Template</button>
+            <button class="btn btn-secondary btn-sm" onclick="triggerImportPriceFileDialog('replace')" style="color:#dc2626; font-weight:700;" title="Xóa toàn bộ giá cũ, nạp mới 100% từ file">🔄 Nạp Mới 100%</button>
+            <button class="btn btn-primary btn-sm" onclick="triggerImportPriceFileDialog('append')" style="font-weight:700;" title="Trùng giữ nguyên, cập nhật thay đổi & thêm mới">➕ Nạp Bổ Sung</button>
+            <input type="file" id="fileInputPriceImport" accept=".csv,.xlsx,.txt" style="display:none;" onchange="handleImportPriceFile(event)">
+          </div>
+        </div>
+
+        <table class="data-table" style="width:100%; font-size:12.5px;" id="tablePriceListMain">
+          <thead>
+            <tr>
+              <th style="width:30%;">Tên Nguyên Liệu</th>
+              <th style="width:20%;">Danh Mục</th>
+              <th style="width:16%;">Đơn Vị Mua</th>
+              <th style="width:18%;">Giá Nhập (VND)</th>
+              <th style="width:16%;">Quy Đổi Cơ Bản</th>
+              <th style="width:30px;"></th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPriceList">
+            <!-- Nạp động từ MASTER_INGREDIENTS -->
+          </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+          <button class="btn btn-secondary btn-sm" style="color:#ef4444;" onclick="clearAllIngredientsToEmpty()">
+            🗑️ Xóa Sạch Bảng Giá
+          </button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="closePriceListModal()">Đóng</button>
+            <button class="btn btn-primary" onclick="savePriceListChanges()">Cập Nhật & Lưu Bảng Giá</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL 4: SAO LƯU & PHỤC HỒI DỮ LIỆU (BACKUP & RESTORE) ================= -->
+  <div class="app-modal-backdrop" id="modalBackupRestoreDialog">
+    <div class="app-modal-window" style="width: 650px;">
+      <div class="app-modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px;">
+          <img src="img/bfresh_logo_official.jpg" alt="BFresh" style="width:24px; height:24px; border-radius:50%; border:1px solid #15a802;">
+          💾 Quản Lý Sao Lưu & Phục Hồi Dữ Liệu
+        </h3>
+        <button class="app-modal-close" onclick="closeBackupRestoreModal()">&times;</button>
+      </div>
+      <div class="app-modal-content">
+        <p style="font-size:12.5px; color:#475569; margin-bottom:16px; line-height:1.5;">
+          Hệ thống đã tự động lưu trữ dữ liệu vĩnh viễn trên máy tính của bạn (LocalStorage). Để an toàn tuyệt đối khi chuyển máy hoặc bảo trì vá lỗi, bạn có thể xuất file sao lưu JSON hoặc nạp lại bất cứ lúc nào.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <!-- 1. Xuất file backup -->
+          <div style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:13.5px; color:#0f172a; display:block;">1. Xuất File Sao Lưu Hệ Thống (.JSON)</strong>
+              <span style="font-size:12px; color:#64748b;">Tải về máy toàn bộ: Bảng giá, Cấu thành mẻ BTP, Menu định lượng món.</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="exportSystemBackupJSON()">
+              📤 Xuất File JSON
+            </button>
+          </div>
+
+          <!-- 2. Nạp lại file backup -->
+          <div style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:13.5px; color:#0f172a; display:block;">2. Nạp Lại File Sao Lưu (Restore)</strong>
+              <span style="font-size:12px; color:#64748b;">Phục hồi dữ liệu nguyên vẹn từ file sao lưu JSON đã lưu trước đó.</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('inputRestoreJSONFile').click()">
+              📥 Nạp File JSON
+            </button>
+            <input type="file" id="inputRestoreJSONFile" accept=".json" style="display:none;" onchange="handleRestoreJSONFile(event)">
+          </div>
+
+          <!-- 3. Đặt lại mẫu gốc -->
+          <div style="border:1px solid #fee2e2; border-radius:10px; padding:14px; background:#fff5f5; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:13.5px; color:#b91c1c; display:block;">3. Khôi Phục Dữ Liệu Mẫu Mặc Định</strong>
+              <span style="font-size:12px; color:#ef4444;">Xóa dữ liệu hiện tại và khôi phục lại bộ công thức & giá mẫu gốc.</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="color:#b91c1c; border-color:#fca5a5;" onclick="resetToDefaultDataTemplate()">
+              🔄 Đặt Lại Mẫu
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+          <button class="btn btn-secondary" onclick="closeBackupRestoreModal()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL 5: NẠP FILE CÔNG THỨC MENU (CSV/EXCEL TEMPLATE) ================= -->
+  <div class="app-modal-backdrop" id="modalImportRecipeDialog">
+    <div class="app-modal-window" style="width: 760px;">
+      <div class="app-modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px;">
+          📥 Nạp Công Thức Định Lượng Menu (File CSV / Excel)
+        </h3>
+        <button class="app-modal-close" onclick="closeImportRecipeModal()">&times;</button>
+      </div>
+      <div class="app-modal-content">
+        <p style="font-size:12.5px; color:#475569; margin-bottom:14px; line-height:1.5;">
+          Phương án nạp hàng loạt công thức menu từ file template Excel/CSV. Hệ thống sử dụng <strong>chung 1 nguồn Bảng Giá Nguyên Liệu & Mẻ BTP</strong> để tự động điền đơn vị và tính toán giá vốn chính xác cho từng ly nước!
+        </p>
+
+        <!-- Hộp hướng dẫn Rules chuẩn của ứng dụng -->
+        <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:12px; color:#166534; line-height:1.65;">
+          <div style="font-weight:800; font-size:12.5px; margin-bottom:6px; color:#15803d; display:flex; align-items:center; gap:6px;">
+            <span>📋 QUY TẮC ĐỊNH DẠNG FILE TEMPLATE (7 CỘT CHUẨN):</span>
+          </div>
+          <div>1. <strong>Tên Món:</strong> Tên hiển thị trên menu (ví dụ: <em>Trà Sữa Olong Nướng BFresh</em>)</div>
+          <div>2. <strong>Danh Mục:</strong> Nhóm món (ví dụ: <em>Trà Sữa, Trà Trái Cây, Cà Phê...</em> - Tự tạo nhóm mới tùy ý)</div>
+          <div>3. <strong>Size:</strong> Size ly (ví dụ: <em>Size M, Size L, 500ml, 700ml...</em>)</div>
+          <div>4. <strong>Giá Bán:</strong> Giá bán niêm yết tại quán (ví dụ: <em>35000</em>)</div>
+          <div>5. <strong>Nhóm Thành Phần:</strong> Điền 1 trong 3 nhóm: <code>Mẻ</code> (hoặc <code>BTP</code>), <code>Nguyên Liệu</code>, <code>Bao Bì</code></div>
+          <div>6. <strong>Tên Thành Phần:</strong> Tên nguyên liệu thô hoặc Mẻ (khớp với Bảng Giá hoặc Mẻ đã tạo)</div>
+          <div>7. <strong>Định Lượng / Ly:</strong> Khối lượng sử dụng cho 1 ly nước (ví dụ: <em>120, 30, 1...</em>)</div>
+          <div style="margin-top:6px; font-style:italic; color:#047857;">
+            💡 <em>Mẹo: Các dòng có cùng Tên Món + Size sẽ được hệ thống tự động gom lại thành 1 thẻ món hoàn chỉnh trong Menu!</em>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;" class="modal-grid-2col">
+          <!-- 1. Tải file mẫu -->
+          <div style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <div>
+              <strong style="font-size:13px; color:#0f172a; display:block; margin-bottom:4px;">1. Tải File Mẫu Chuẩn (Excel / CSV)</strong>
+              <span style="font-size:11.5px; color:#64748b; line-height:1.4; display:block;">File mẫu chuẩn 1 Sheet dạng Thẻ Khối, đã có sẵn 5 Mẻ cốt & 7 Món trà trái cây nhiệt đới chuẩn R&D.</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <a href="BFresh_Mau_Cong_Thuc_Dinh_Luong_Chuan.xlsx" download class="btn btn-secondary btn-sm" style="flex:1; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">
+                📊 Tải Excel (.XLSX)
+              </a>
+              <button class="btn btn-secondary btn-sm" onclick="downloadRecipeTemplateCSV()" style="flex:1; font-weight:600;">
+                📄 Tải CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Nạp file từ máy -->
+          <div style="border:1.5px solid #86efac; border-radius:10px; padding:14px; background:#f0fdf4; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <div>
+              <strong style="font-size:13px; color:#166534; display:block; margin-bottom:4px;">2. Tải Lên File Công Thức (.xlsx / .csv)</strong>
+              <span style="font-size:11.5px; color:#475569; line-height:1.4; display:block;">Chọn chế độ tương ứng để ứng dụng tự động bóc tách Mẻ, tính giá vốn và tạo thẻ món:</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-primary btn-sm" onclick="triggerImportRecipeFileDialog('replace')" style="width:100%; font-weight:700; background:#dc2626; border-color:#dc2626; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 12px; font-size:12.5px;">
+                🔄 Nạp Mới 100% (Xóa cũ, ghi đè toàn bộ)
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="triggerImportRecipeFileDialog('append')" style="width:100%; font-weight:700; background:#16a34a; border-color:#16a34a; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 12px; font-size:12.5px;">
+                ➕ Nạp Bổ Sung (Trùng giữ nguyên, cập nhật thay đổi & thêm mới)
+              </button>
+            </div>
+            <input type="file" id="fileInputRecipeImport" accept=".xlsx,.xls,.csv,.txt,.tsv" style="display:none;" onchange="handleImportRecipeFile(event)">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn btn-secondary" onclick="closeImportRecipeModal()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= JAVASCRIPT HỆ THỐNG THỰC TẾ (PRODUCTION READY) ================= -->
+  <script>
+    /* =========================================================================
+     * MODULE 1: STORAGE & PERSISTENCE (LƯU TRỮ VĨNH VIỄN TRÊN MÁY TÍNH)
+     * ========================================================================= */
+    const STORAGE_KEY = 'BFRESH_COST_PROD_DATA_V1';
+
+    function saveToLocalStorage() {
+      try {
+        const payload = {
+          version: '1.0',
+          lastUpdated: new Date().toISOString(),
+          masterIngredients: MASTER_INGREDIENTS,
+          batchDetailsMap: BATCH_DETAILS_MAP,
+          allRecipes: ALL_RECIPES
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (err) {
+        console.error("Lỗi khi lưu LocalStorage:", err);
+      }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (data.masterIngredients && Array.isArray(data.masterIngredients) && data.masterIngredients.length > 0) {
+            MASTER_INGREDIENTS = data.masterIngredients;
+            // Tự động bổ sung các nguyên liệu chuẩn mới nếu chưa có trong danh sách lưu của người dùng
+            if (typeof DEFAULT_MASTER_INGREDIENTS !== 'undefined' && Array.isArray(DEFAULT_MASTER_INGREDIENTS)) {
+              DEFAULT_MASTER_INGREDIENTS.forEach(def => {
+                const exists = MASTER_INGREDIENTS.some(m => m.name.toLowerCase().trim() === def.name.toLowerCase().trim());
+                if (!exists) {
+                  MASTER_INGREDIENTS.push(JSON.parse(JSON.stringify(def)));
+                }
+              });
+            }
+          }
+          if (data.batchDetailsMap && Object.keys(data.batchDetailsMap).length > 0) {
+            BATCH_DETAILS_MAP = data.batchDetailsMap;
+          }
+          if (data.allRecipes && Array.isArray(data.allRecipes) && data.allRecipes.length > 0) {
+            ALL_RECIPES = data.allRecipes;
+          }
+          syncPriceFromMasterToAllRecipes();
+          return true;
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải LocalStorage:", err);
+      }
+      return false;
+    }
+
+
+    /* =========================================================================
+     * MODULE 2: DỮ LIỆU GỐC & MẪU KHỞI TẠO (DEFAULT TEMPLATE)
+     * ========================================================================= */
+    const DEFAULT_MASTER_INGREDIENTS = [
+      { id: 'tra_olong', name: 'Trà Olong Nướng Đặc Biệt', cat: 'Trà & Cà Phê', buyUnit: 'kg', buyPrice: 280000, baseUnit: 'g', ratio: 1000, basePrice: 280 },
+      { id: 'tra_lai', name: 'Trà Lài Hoa Nhài Thơm', cat: 'Trà & Cà Phê', buyUnit: 'kg', buyPrice: 210000, baseUnit: 'g', ratio: 1000, basePrice: 210 },
+      { id: 'cam_vang', name: 'Cam Vàng Mỹ / Cam Sành Tươi', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 42000, baseUnit: 'g', ratio: 1000, basePrice: 42 },
+      { id: 'tac_tuoi', name: 'Trái tắc / Quất tươi', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 30000, baseUnit: 'g', ratio: 1000, basePrice: 30 },
+      { id: 'puree_oi', name: 'Puree / Mứt ổi hồng Ruby', cat: 'Topping', buyUnit: 'hộp 1kg', buyPrice: 125000, baseUnit: 'g', ratio: 1000, basePrice: 125 },
+      { id: 'syrup_oi', name: 'Siro ổi hồng', cat: 'Siro & Sốt', buyUnit: 'chai 700ml', buyPrice: 95000, baseUnit: 'ml', ratio: 700, basePrice: 135.7 },
+      { id: 'mang_cau', name: 'Thịt mãng cầu xiêm ngâm đường', cat: 'Trái Cây Tươi', buyUnit: 'hộp 1kg', buyPrice: 85000, baseUnit: 'g', ratio: 1000, basePrice: 85 },
+      { id: 'vai_ngam', name: 'Trái vải thiều ngâm đóng hộp', cat: 'Topping', buyUnit: 'hộp 565g', buyPrice: 45000, baseUnit: 'g', ratio: 565, basePrice: 79.6 },
+      { id: 'syrup_vai', name: 'Siro vải', cat: 'Siro & Sốt', buyUnit: 'chai 700ml', buyPrice: 95000, baseUnit: 'ml', ratio: 700, basePrice: 135.7 },
+      { id: 'syrup_hoa_hong', name: 'Siro hoa hồng cao cấp', cat: 'Siro & Sốt', buyUnit: 'chai 700ml', buyPrice: 110000, baseUnit: 'ml', ratio: 700, basePrice: 157.1 },
+      { id: 'syrup_dua_luoi', name: 'Puree / Siro dưa lưới Cantaloupe', cat: 'Siro & Sốt', buyUnit: 'chai 700ml', buyPrice: 95000, baseUnit: 'ml', ratio: 700, basePrice: 135.7 },
+      { id: 'nha_dam', name: 'Thạch nha đam giòn', cat: 'Topping', buyUnit: 'túi 1kg', buyPrice: 38000, baseUnit: 'g', ratio: 1000, basePrice: 38 },
+      { id: 'chanh_day', name: 'Cốt chanh dây tươi (có hạt)', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 45000, baseUnit: 'g', ratio: 1000, basePrice: 45 },
+      { id: 'mat_ong', name: 'Mật ong hoa nhãn nguyên chất', cat: 'Đường & C chai', buyUnit: 'chai 1000ml', buyPrice: 120000, baseUnit: 'ml', ratio: 1000, basePrice: 120 },
+      { id: 'sa_cay', name: 'Sả cây tươi đập dập', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 20000, baseUnit: 'g', ratio: 1000, basePrice: 20 },
+      { id: 'mut_xoai', name: 'Mứt xoài tươi miếng / Puree xoài', cat: 'Topping', buyUnit: 'hộp 1kg', buyPrice: 115000, baseUnit: 'g', ratio: 1000, basePrice: 115 },
+      { id: 'trai_thom', name: 'Trái Thơm / Dứa Tươi', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 25000, baseUnit: 'g', ratio: 1000, basePrice: 25 },
+      { id: 'dau_tay', name: 'Dâu Tây Đà Lạt Tươi', cat: 'Trái Cây Tươi', buyUnit: 'kg', buyPrice: 95000, baseUnit: 'g', ratio: 1000, basePrice: 95 },
+      { id: 'syrup_dao', name: 'Siro đào', cat: 'Siro & Sốt', buyUnit: 'chai 700ml', buyPrice: 95000, baseUnit: 'ml', ratio: 700, basePrice: 135.7 },
+      { id: 'mut_dao', name: 'Mứt đào miếng', cat: 'Topping', buyUnit: 'hộp 1kg', buyPrice: 135000, baseUnit: 'g', ratio: 1000, basePrice: 135 },
+      { id: 'cf_moc', name: 'Cà phê mộc pha phin', cat: 'Trà & Cà Phê', buyUnit: 'kg', buyPrice: 160000, baseUnit: 'g', ratio: 1000, basePrice: 160 },
+      { id: 'bot_kem', name: 'Bột kem béo', cat: 'Sữa & Bột', buyUnit: 'kg', buyPrice: 78000, baseUnit: 'g', ratio: 1000, basePrice: 78 },
+      { id: 'sua_dac', name: 'Sữa đặc', cat: 'Sữa & Bột', buyUnit: 'hộp 1280g', buyPrice: 65000, baseUnit: 'g', ratio: 1280, basePrice: 50.8 },
+      { id: 'sua_tuoi', name: 'Sữa tươi không đường', cat: 'Sữa & Bột', buyUnit: 'hộp 1l', buyPrice: 35000, baseUnit: 'ml', ratio: 1000, basePrice: 35 },
+      { id: 'tc_den', name: 'Trân châu đen', cat: 'Topping', buyUnit: 'kg', buyPrice: 48000, baseUnit: 'g', ratio: 1000, basePrice: 48 },
+      { id: 'duong_den', name: 'Đường đen', cat: 'Đường & C chai', buyUnit: 'kg', buyPrice: 52000, baseUnit: 'g', ratio: 1000, basePrice: 52 },
+      { id: 'duong_nuoc', name: 'Đường nước', cat: 'Đường & C chai', buyUnit: 'chai 1000ml', buyPrice: 35000, baseUnit: 'ml', ratio: 1000, basePrice: 35 },
+      { id: 'da_vien', name: 'Đá viên', cat: 'Khác', buyUnit: 'kg', buyPrice: 3000, baseUnit: 'g', ratio: 1000, basePrice: 3 },
+      { id: 'kem_cheese', name: 'Kem cheese', cat: 'Topping', buyUnit: 'hộp 500g', buyPrice: 75000, baseUnit: 'g', ratio: 500, basePrice: 150 },
+      { id: 'ly_700', name: 'Ly nhựa PP 700ml', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 950, baseUnit: 'cái', ratio: 1, basePrice: 950 },
+      { id: 'nap_700', name: 'Nắp bằng / nắp tim 700ml', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 480, baseUnit: 'cái', ratio: 1, basePrice: 480 },
+      { id: 'ly_500', name: 'Ly nhựa PP 500ml', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 850, baseUnit: 'cái', ratio: 1, basePrice: 850 },
+      { id: 'nap_tim', name: 'Nắp tim đen', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 440, baseUnit: 'cái', ratio: 1, basePrice: 440 },
+      { id: 'ong_hut_12', name: 'Ống hút phi 12', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 250, baseUnit: 'cái', ratio: 1, basePrice: 250 },
+      { id: 'tui_t', name: 'Túi chữ T 1 ly', cat: 'Bao Bì', buyUnit: 'cái', buyPrice: 120, baseUnit: 'cái', ratio: 1, basePrice: 120 }
+    ];
+
+    let MASTER_INGREDIENTS = JSON.parse(JSON.stringify(DEFAULT_MASTER_INGREDIENTS));
+
+    let BATCH_DETAILS_MAP = {
+  "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)": {
+    "id": "btp_0",
+    "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+    "outputQty": 1300,
+    "unit": "ml",
+    "expireHours": 6,
+    "ingredients": [
+      {
+        "name": "Trà Lài Hoa Nhài Thơm",
+        "qty": 40,
+        "unit": "g",
+        "price": 210,
+        "total": 8400,
+        "note": "Ủ trà ở nhiệt độ 85°C trong 10 phút"
+      },
+      {
+        "name": "Nước Sôi Tinh Khiết",
+        "qty": 1200,
+        "unit": "ml",
+        "price": 0,
+        "total": 0,
+        "note": "Nước sôi đạt chuẩn để giữ hương lài"
+      },
+      {
+        "name": "Đá viên sốc nhiệt cốt trà",
+        "qty": 300,
+        "unit": "g",
+        "price": 3,
+        "total": 900,
+        "note": "Lọc bã và cho đá để sốc nhiệt khóa hương"
+      }
+    ]
+  },
+  "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)": {
+    "id": "btp_1",
+    "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+    "outputQty": 1200,
+    "unit": "ml",
+    "expireHours": 6,
+    "ingredients": [
+      {
+        "name": "Trà Olong Nướng Đặc Biệt",
+        "qty": 45,
+        "unit": "g",
+        "price": 280,
+        "total": 12600,
+        "note": "Ủ trà ở nhiệt độ 90°C trong 12 phút"
+      },
+      {
+        "name": "Nước Sôi Tinh Khiết",
+        "qty": 1100,
+        "unit": "ml",
+        "price": 0,
+        "total": 0,
+        "note": "Chiết xuất tinh chất olong"
+      },
+      {
+        "name": "Đá viên sốc nhiệt",
+        "qty": 200,
+        "unit": "g",
+        "price": 3,
+        "total": 600,
+        "note": "Làm nguội nhanh giữ màu vàng kim"
+      }
+    ]
+  },
+  "Nước Đường Pha Nước (Syrup Simple 2:1)": {
+    "id": "btp_2",
+    "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+    "outputQty": 1000,
+    "unit": "ml",
+    "expireHours": 72,
+    "ingredients": [
+      {
+        "name": "Đường cát trắng / Đường nước",
+        "qty": 1000,
+        "unit": "ml",
+        "price": 35,
+        "total": 35000,
+        "note": "Nấu theo tỷ lệ 2 đường : 1 nước"
+      },
+      {
+        "name": "Nước lọc tinh khiết",
+        "qty": 500,
+        "unit": "ml",
+        "price": 0,
+        "total": 0,
+        "note": "Đun sôi nhẹ khuấy tan hoàn toàn"
+      }
+    ]
+  },
+  "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)": {
+    "id": "btp_3",
+    "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+    "outputQty": 400,
+    "unit": "ml",
+    "expireHours": 12,
+    "ingredients": [
+      {
+        "name": "Trái tắc / Quất tươi",
+        "qty": 500,
+        "unit": "g",
+        "price": 30,
+        "total": 15000,
+        "note": "Vắt lấy nước cốt nguyên chất, lọc sạch hạt"
+      },
+      {
+        "name": "Đường nước nguyên chất",
+        "qty": 150,
+        "unit": "ml",
+        "price": 35,
+        "total": 5250,
+        "note": "Hãm độ chua gắt, giữ màu xanh vàng tự nhiên"
+      }
+    ]
+  },
+  "Kem Cheese Macchiato (Mẻ 600ml)": {
+    "id": "btp_4",
+    "name": "Kem Cheese Macchiato (Mẻ 600ml)",
+    "outputQty": 600,
+    "unit": "ml",
+    "expireHours": 24,
+    "ingredients": [
+      {
+        "name": "Kem cheese",
+        "qty": 200,
+        "unit": "g",
+        "price": 150,
+        "total": 30000,
+        "note": "Tán mịn cùng sữa tươi"
+      },
+      {
+        "name": "Sữa tươi không đường",
+        "qty": 200,
+        "unit": "ml",
+        "price": 35,
+        "total": 7000,
+        "note": "Đánh đều tạo nền"
+      },
+      {
+        "name": "Bột kem béo",
+        "qty": 100,
+        "unit": "g",
+        "price": 78,
+        "total": 7800,
+        "note": "Đánh bông mịn tạo bọt macchiato bồng bềnh"
+      }
+    ]
+  }
+};
+
+    let ALL_RECIPES = [
+  {
+    "id": "rec_1",
+    "name": "Trà Đào Cam Sả BFresh",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 39000,
+    "isExpanded": true,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+          "qty": 150,
+          "unit": "ml",
+          "price": 11,
+          "note": "Nền trà olong thanh dịu"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 20,
+          "unit": "ml",
+          "price": 35,
+          "note": "Ngọt dịu chuẩn vị"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Siro đào",
+          "qty": 20,
+          "unit": "ml",
+          "price": 135.7,
+          "note": "Hương đào giòn"
+        },
+        {
+          "name": "Mứt đào miếng",
+          "qty": 35,
+          "unit": "g",
+          "price": 135,
+          "note": "2 miếng đào ngâm giòn ngọt"
+        },
+        {
+          "name": "Cam Vàng Mỹ / Cam Sành Tươi",
+          "qty": 40,
+          "unit": "g",
+          "price": 42,
+          "note": "1 lát cam vàng vắt nước + trang trí"
+        },
+        {
+          "name": "Sả cây tươi đập dập",
+          "qty": 10,
+          "unit": "g",
+          "price": 20,
+          "note": "Dầm nhẹ tạo hương sả tự nhiên"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L chuyên trà trái cây"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to hút mứt"
+        },
+        {
+          "name": "Túi chữ T 1 ly",
+          "qty": 1,
+          "unit": "cái",
+          "price": 120,
+          "note": "Túi xách mang đi"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_2",
+    "name": "Trà Ổi Hồng Ruby Hạt Lựu",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 42000,
+    "isExpanded": true,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+          "qty": 140,
+          "unit": "ml",
+          "price": 7.2,
+          "note": "Hương hoa lài tôn vị ổi"
+        },
+        {
+          "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+          "qty": 10,
+          "unit": "ml",
+          "price": 50.6,
+          "note": "Tạo vị chua thanh kích vị giác"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 15,
+          "unit": "ml",
+          "price": 35,
+          "note": "Cân bằng độ chua ngọt"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Puree / Mứt ổi hồng Ruby",
+          "qty": 35,
+          "unit": "g",
+          "price": 125,
+          "note": "Mứt ổi hồng sánh đặc chuẩn vị"
+        },
+        {
+          "name": "Siro ổi hồng",
+          "qty": 15,
+          "unit": "ml",
+          "price": 135.7,
+          "note": "Tạo màu hồng san hô bắt mắt"
+        },
+        {
+          "name": "Thạch nha đam giòn",
+          "qty": 40,
+          "unit": "g",
+          "price": 38,
+          "note": "Topping nha đam giòn sần sật"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_3",
+    "name": "Trà Mãng Cầu Xiêm Tươi Nhiệt Đới",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 42000,
+    "isExpanded": false,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+          "qty": 150,
+          "unit": "ml",
+          "price": 7.2,
+          "note": "Trà lài đậm đà mát lạnh"
+        },
+        {
+          "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+          "qty": 12,
+          "unit": "ml",
+          "price": 50.6,
+          "note": "Chua thanh chống ngấy"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 20,
+          "unit": "ml",
+          "price": 35,
+          "note": "Độ ngọt thanh"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Thịt mãng cầu xiêm ngâm đường",
+          "qty": 60,
+          "unit": "g",
+          "price": 85,
+          "note": "Mãng cầu tươi xé sợi ngâm đường"
+        },
+        {
+          "name": "Muối hồng / Muối tinh",
+          "qty": 0.3,
+          "unit": "g",
+          "price": 0,
+          "note": "Chút xíu muối dằn vị đậm đà"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to hút mãng cầu"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_4",
+    "name": "Trà Vải Hoa Hồng Hoàng Gia",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 45000,
+    "isExpanded": false,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Olong Vàng Nhiệt Đới (Mẻ 1.2L)",
+          "qty": 140,
+          "unit": "ml",
+          "price": 11,
+          "note": "Cốt olong thơm dịu"
+        },
+        {
+          "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+          "qty": 8,
+          "unit": "ml",
+          "price": 50.6,
+          "note": "Hãm ngọt tạo hậu thanh"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 15,
+          "unit": "ml",
+          "price": 35,
+          "note": "Độ ngọt vừa vặn"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Trái vải thiều ngâm đóng hộp",
+          "qty": 45,
+          "unit": "g",
+          "price": 79.6,
+          "note": "3 trái vải giòn mọng nước"
+        },
+        {
+          "name": "Siro vải",
+          "qty": 20,
+          "unit": "ml",
+          "price": 135.7,
+          "note": "Hương vải đậm đà"
+        },
+        {
+          "name": "Siro hoa hồng cao cấp",
+          "qty": 10,
+          "unit": "ml",
+          "price": 157.1,
+          "note": "Hương hoa hồng sang trọng quyến rũ"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_5",
+    "name": "Trà Dưa Lưới Nha Đam BFresh",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 39000,
+    "isExpanded": false,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+          "qty": 140,
+          "unit": "ml",
+          "price": 7.2,
+          "note": "Cốt trà lài êm dịu"
+        },
+        {
+          "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+          "qty": 8,
+          "unit": "ml",
+          "price": 50.6,
+          "note": "Tạo vị chua nhẹ tự nhiên"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 18,
+          "unit": "ml",
+          "price": 35,
+          "note": "Độ ngọt thanh khiết"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Puree / Siro dưa lưới Cantaloupe",
+          "qty": 30,
+          "unit": "ml",
+          "price": 135.7,
+          "note": "Hương dưa lưới tươi mát"
+        },
+        {
+          "name": "Thạch nha đam giòn",
+          "qty": 50,
+          "unit": "g",
+          "price": 38,
+          "note": "Topping thanh nhiệt"
+        },
+        {
+          "name": "Cam Vàng Mỹ / Chanh vàng",
+          "qty": 20,
+          "unit": "g",
+          "price": 0,
+          "note": "1 lát trang trí miệng ly"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_6",
+    "name": "Trà Chanh Dây Kim Quất Mật Ong",
+    "category": "Trà Trái Cây",
+    "size": "Size L (700ml)",
+    "salePrice": 39000,
+    "isExpanded": false,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+          "qty": 140,
+          "unit": "ml",
+          "price": 7.2,
+          "note": "Cốt trà lài tươi mát"
+        },
+        {
+          "name": "Nước Cốt Tắc Tươi Thanh Mát (Mẻ 400ml)",
+          "qty": 15,
+          "unit": "ml",
+          "price": 50.6,
+          "note": "Vị quất tươi kích thích vị giác"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 15,
+          "unit": "ml",
+          "price": 35,
+          "note": "Cân bằng độ chua chanh dây"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Cốt chanh dây tươi (có hạt)",
+          "qty": 25,
+          "unit": "g",
+          "price": 45,
+          "note": "Chua đậm đà thơm ngát"
+        },
+        {
+          "name": "Mật ong hoa nhãn nguyên chất",
+          "qty": 20,
+          "unit": "ml",
+          "price": 120,
+          "note": "Ngọt hậu đậm đà mật ong"
+        },
+        {
+          "name": "Tắc tươi cắt đôi nguyên quả",
+          "qty": 15,
+          "unit": "g",
+          "price": 0,
+          "note": "2 quả tắc dầm nhẹ trang trí"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp bằng / nắp tim 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 480,
+          "note": "Nắp đậy"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rec_7",
+    "name": "Trà Xoài Chanh Leo Macchiato",
+    "category": "Macchiato / Cheese",
+    "size": "Size L (700ml)",
+    "salePrice": 45000,
+    "isExpanded": false,
+    "groups": {
+      "btp": [
+        {
+          "name": "Nước Cốt Trà Lài Hoa Nhài (Mẻ 1.3L)",
+          "qty": 130,
+          "unit": "ml",
+          "price": 7.2,
+          "note": "Cốt trà nền thanh khiết"
+        },
+        {
+          "name": "Nước Đường Pha Nước (Syrup Simple 2:1)",
+          "qty": 15,
+          "unit": "ml",
+          "price": 35,
+          "note": "Độ ngọt tiêu chuẩn"
+        },
+        {
+          "name": "Kem Cheese Macchiato (Mẻ 600ml)",
+          "qty": 45,
+          "unit": "ml",
+          "price": 74.7,
+          "note": "Lớp kem cheese mặn béo phủ mặt"
+        }
+      ],
+      "raw": [
+        {
+          "name": "Mứt xoài tươi miếng / Puree xoài",
+          "qty": 35,
+          "unit": "g",
+          "price": 115,
+          "note": "Xoài chín thơm ngọt lịm"
+        },
+        {
+          "name": "Cốt chanh dây tươi",
+          "qty": 15,
+          "unit": "g",
+          "price": 45,
+          "note": "Chua thanh tạo độ tương phản vị"
+        }
+      ],
+      "pkg": [
+        {
+          "name": "Ly nhựa PP 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 950,
+          "note": "Ly size L"
+        },
+        {
+          "name": "Nắp tim đen 700ml",
+          "qty": 1,
+          "unit": "cái",
+          "price": 440,
+          "note": "Nắp tim uống kem"
+        },
+        {
+          "name": "Ống hút phi 12",
+          "qty": 1,
+          "unit": "cái",
+          "price": 250,
+          "note": "Ống hút to"
+        },
+        {
+          "name": "Túi chữ T 1 ly",
+          "qty": 1,
+          "unit": "cái",
+          "price": 120,
+          "note": "Túi mang đi"
+        }
+      ]
+    }
+  }
+];
+
+
+    /* =========================================================================
+     * MODULE 3: THUẬT TOÁN QUY ĐỔI ĐƠN VỊ THÔNG MINH (SMART CONVERTER F&B)
+     * ========================================================================= */
+    function smartCalculateBasePrice(buyUnit, convertCol, buyPrice) {
+      let baseUnit = 'g';
+      let ratio = 1000;
+      
+      const cleanConvert = (convertCol || '').toLowerCase().replace(/\s+/g, '');
+      const cleanUnit = (buyUnit || '').toLowerCase().replace(/\s+/g, '');
+
+      // 1. Phân tích ưu tiên theo cột quy đổi (Ví dụ: "1280g", "1000ml", "700ml", "1cai")
+      if (cleanConvert && cleanConvert.length > 0) {
+        const numMatch = cleanConvert.match(/([0-9.]+)/);
+        const num = numMatch ? parseFloat(numMatch[1]) : 1;
+
+        if (cleanConvert.includes('ml') || cleanConvert.includes('lít') || cleanConvert.includes('lit')) {
+          baseUnit = 'ml';
+          ratio = cleanConvert.includes('ml') ? num : (num * 1000);
+        } else if (cleanConvert.includes('cai') || cleanConvert.includes('cái') || cleanConvert.includes('ly') || cleanConvert.includes('nap') || cleanConvert.includes('hop') || cleanConvert.includes('chai')) {
+          baseUnit = 'cái';
+          ratio = num || 1;
+        } else {
+          baseUnit = 'g';
+          ratio = cleanConvert.includes('kg') ? (num * 1000) : num;
+        }
+      } 
+      // 2. Nếu không có cột quy đổi, bóc tách chính xác từ Đơn Vị Mua
+      else {
+        if (cleanUnit.includes('1280g') || cleanUnit.includes('1.28kg')) {
+          baseUnit = 'g'; ratio = 1280;
+        } else if (cleanUnit.includes('700ml') || cleanUnit.includes('750ml') || cleanUnit.includes('500ml')) {
+          const m = cleanUnit.match(/([0-9]+)ml/);
+          ratio = m ? parseFloat(m[1]) : 700;
+          baseUnit = 'ml';
+        } else if (cleanUnit.includes('lít') || cleanUnit.includes('lit') || cleanUnit.includes('1l') || cleanUnit.includes('1000ml')) {
+          baseUnit = 'ml'; ratio = 1000;
+        } else if (cleanUnit.includes('cái') || cleanUnit.includes('cai') || cleanUnit.includes('ly') || cleanUnit.includes('nap') || cleanUnit.includes('tui') || cleanUnit.includes('ong')) {
+          baseUnit = 'cái'; ratio = 1;
+        } else if (cleanUnit.includes('kg')) {
+          const m = cleanUnit.match(/([0-9.]+)kg/);
+          ratio = m ? (parseFloat(m[1]) * 1000) : 1000;
+          baseUnit = 'g';
+        } else if (cleanUnit.includes('500g')) {
+          baseUnit = 'g'; ratio = 500;
+        } else {
+          baseUnit = 'g'; ratio = 1000;
+        }
+      }
+
+      const basePrice = ratio > 0 ? (buyPrice / ratio) : buyPrice;
+      return { baseUnit, ratio, basePrice: Math.round(basePrice * 10) / 10 };
+    }
+
+    // TÌM KIẾM NGUYÊN LIỆU THÔNG MINH (FUZZY MATCHING)
+    function getMasterIngredientPrice(name) {
+      if (!name) return null;
+      const clean = name.toLowerCase().trim();
+
+      // Khớp chính xác 100%
+      let match = MASTER_INGREDIENTS.find(i => i.name.toLowerCase().trim() === clean);
+      if (match) return { price: match.basePrice, unit: match.baseUnit, fullName: match.name };
+
+      // Khớp gần đúng (Chứa từ khóa chính: ví dụ "sữa đặc" khớp "Sữa đặc Ngôi sao")
+      match = MASTER_INGREDIENTS.find(i => {
+        const iClean = i.name.toLowerCase().trim();
+        return iClean.includes(clean) || clean.includes(iClean);
+      });
+      if (match) return { price: match.basePrice, unit: match.baseUnit, fullName: match.name };
+
+      return null;
+    }
+
+    function getBatchUnitPrice(batchName) {
+      if (!batchName) return null;
+      let b = BATCH_DETAILS_MAP[batchName];
+      if (!b) {
+        const clean = batchName.toLowerCase().replace(/^(btp|mẻ|me)\s*[-:]?\s*/i, '').trim();
+        const key = Object.keys(BATCH_DETAILS_MAP).find(k => {
+          const kClean = k.toLowerCase().replace(/^(btp|mẻ|me)\s*[-:]?\s*/i, '').trim();
+          return kClean === clean || kClean.includes(clean) || clean.includes(kClean);
+        });
+        if (key) b = BATCH_DETAILS_MAP[key];
+      }
+      if (!b) return null;
+      let tot = 0;
+      b.ingredients.forEach(i => {
+        let p = i.price || 0;
+        if (!p) {
+          const m = getMasterIngredientPrice(i.name);
+          if (m) p = m.price;
+        }
+        tot += ((i.qty || 0) * p);
+      });
+      const uPrice = b.outputQty > 0 ? (tot / b.outputQty) : 0;
+      return { price: Math.round(uPrice * 10) / 10, unit: b.unit || 'ml' };
+    }
+
+
+    /* =========================================================================
+     * MODULE 4: ACCORDION RECIPES MENU RENDERER
+     * ========================================================================= */
+    let currentFilterCat = 'all';
+    let chartInstancesMap = {};
+
+    // TỰ ĐỘNG CẬP NHẬT TAB DANH MỤC DỰA VÀO DỮ LIỆU THỰC TẾ
+    function renderCategoryFilterTabs() {
+      const bar = document.getElementById('categoryFilterBar');
+      if (!bar) return;
+
+      const categoriesSet = new Set();
+      ALL_RECIPES.forEach(r => {
+        if (r.category && r.category.trim()) {
+          categoriesSet.add(r.category.trim());
+        }
+      });
+      const categories = Array.from(categoriesSet);
+
+      if (currentFilterCat !== 'all' && !categories.includes(currentFilterCat)) {
+        currentFilterCat = 'all';
+      }
+
+      let html = `<button class="filter-pill-btn ${currentFilterCat === 'all' ? 'active' : ''}" data-cat="all" onclick="filterMenuCategory('all')">Tất Cả Món (${ALL_RECIPES.length})</button>`;
+
+      categories.forEach(cat => {
+        const count = ALL_RECIPES.filter(r => r.category && r.category.trim() === cat).length;
+        const isActive = currentFilterCat === cat ? 'active' : '';
+        html += `<button class="filter-pill-btn ${isActive}" data-cat="${cat}" onclick="filterMenuCategory('${cat}')">${cat} (${count})</button>`;
+      });
+
+      bar.innerHTML = html;
+
+      // Tự động đồng bộ các nhóm này vào ô gợi ý của modal Tạo món / Sửa món
+      const dl = document.getElementById('datalistCategories');
+      if (dl) {
+        dl.innerHTML = categories.map(c => `<option value="${c}">`).join('');
+      }
+    }
+
+    function renderAllRecipeCards() {
+      renderCategoryFilterTabs();
+
+      const container = document.getElementById('recipeCardsContainer');
+      container.innerHTML = '';
+
+      let filtered = ALL_RECIPES.filter(r => {
+        if (currentFilterCat !== 'all' && r.category !== currentFilterCat) return false;
+        return true;
+      });
+
+      const expandedCount = filtered.filter(r => r.isExpanded).length;
+      document.getElementById('badgeTotalRecipesCount').innerText = `Menu: ${filtered.length} Món (${expandedCount} món đang mở chi tiết)`;
+
+      filtered.forEach((recipe) => {
+        let totBtp = 0; recipe.groups.btp.forEach(i => totBtp += Math.round(i.qty * i.price));
+        let totRaw = 0; recipe.groups.raw.forEach(i => totRaw += Math.round(i.qty * i.price));
+        let totPkg = 0; recipe.groups.pkg.forEach(i => totPkg += Math.round(i.qty * i.price));
+        const totalCost = totBtp + totRaw + totPkg;
+        const profit = recipe.salePrice - totalCost;
+        const marginPct = recipe.salePrice > 0 ? (profit / recipe.salePrice * 100) : 0;
+        const costPct = recipe.salePrice > 0 ? (totalCost / recipe.salePrice * 100) : 0;
+        const appProfit = (recipe.salePrice * 0.75) - totalCost;
+        const appMarginPct = recipe.salePrice > 0 ? (appProfit / recipe.salePrice * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = `recipe-box-card ${recipe.isExpanded ? 'is-expanded' : 'is-collapsed'}`;
+        card.id = `card-${recipe.id}`;
+
+        card.innerHTML = `
+          <div class="recipe-box-header" onclick="toggleRecipeCard('${recipe.id}')">
+            <div style="flex:1; width:100%;">
+              <div style="font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span>${recipe.name}</span>
+                <span style="background:rgba(21,168,2,0.1); color:#15a802; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:700;">${recipe.category.toUpperCase()}</span>
+                <span style="background:#f1f5f9; color:#475569; font-size:10.5px; padding:2px 7px; border-radius:4px; font-weight:700;">${recipe.size}</span>
+              </div>
+              <div class="recipe-meta-badges">
+                <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:8px; font-weight:700;">Vốn: ${totalCost.toLocaleString('vi-VN')} đ (${costPct.toFixed(1)}%)</span>
+                <span style="background:#f1f5f9; color:#1e293b; padding:2px 8px; border-radius:8px; font-weight:700;">Bán: ${recipe.salePrice.toLocaleString('vi-VN')} đ</span>
+                <span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:8px; font-weight:700;">Lãi Gộp: +${profit.toLocaleString('vi-VN')} đ (${marginPct.toFixed(1)}%)</span>
+              </div>
+            </div>
+            <div class="recipe-card-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm btn-card-act" onclick="openEditRecipeById('${recipe.id}')">✏️ Sửa</button>
+              <button class="btn btn-secondary btn-sm btn-card-act" style="color:#ef4444;" onclick="deleteRecipeById('${recipe.id}')">✕ Xóa</button>
+              <button class="btn btn-secondary btn-sm btn-card-act btn-card-toggle" onclick="toggleRecipeCard('${recipe.id}')">
+                ${recipe.isExpanded ? 'Thu Gọn ▴' : 'Chi Tiết ▾'}
+              </button>
+            </div>
+          </div>
+
+          <div class="recipe-box-body" id="body-${recipe.id}" style="${recipe.isExpanded ? '' : 'display:none;'}">
+            <div>
+              <div class="ing-group">
+                <div class="ing-group-header">
+                  <span class="ing-group-title g1">🍵 1. Bán Thành Phẩm Chuẩn Bị Trước (Mẻ):</span>
+                  <span style="font-size:12px; font-weight:700; color:#64748b;">Tiểu kế: ${totBtp.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div class="table-responsive-wrapper">
+                  <table class="data-table" style="width:100%; min-width:320px; font-size:12.5px; border-collapse:collapse;">
+                    <thead>
+                      <tr style="border-bottom:1.5px solid #e2e8f0; color:#64748b; font-size:11px; text-transform:uppercase; background:#f8fafc;">
+                        <th style="padding:6px; text-align:left;">Tên Bán Thành Phẩm (Mẻ)</th>
+                        <th style="padding:6px; text-align:right; width:135px;">Định Lượng/ Ly</th>
+                        <th style="padding:6px; text-align:right; width:100px;">Chi Phí/ Ly</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recipe.groups.btp.map(item => `
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                          <td style="padding:7px 6px;">
+                            <span style="font-weight:700; color:#1e293b;">${item.name}</span>
+                            <button class="btn-view-btp" onclick="openBtpModal('${item.name.replace(/'/g, "\\'")}', '${recipe.name.replace(/'/g, "\\'")}', ${item.qty}, '${item.unit}', ${item.price})" style="margin-left:6px;" title="Xem chi tiết công thức nấu mẻ">⚙️ Chi tiết mẻ</button>
+                          </td>
+                          <td style="width:135px; text-align:right; padding:7px 6px;">
+                            <span style="font-weight:700; color:#0284c7;">${item.qty} ${item.unit}</span>
+                            <div style="font-size:11px; color:#64748b;">(Giá mẻ: ${item.price.toFixed(1)} đ/${item.unit})</div>
+                          </td>
+                          <td style="width:100px; text-align:right; font-weight:700; color:#0f172a; padding:7px 6px;">
+                            ${Math.round(item.qty * item.price).toLocaleString('vi-VN')} đ
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="ing-group">
+                <div class="ing-group-header">
+                  <span class="ing-group-title g2">🥬 2. Nguyên Liệu Trực Tiếp & Trái Cây:</span>
+                  <span style="font-size:12px; font-weight:700; color:#64748b;">Tiểu kế: ${totRaw.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div class="table-responsive-wrapper">
+                  <table class="data-table" style="width:100%; min-width:320px; font-size:12.5px; border-collapse:collapse;">
+                    <thead>
+                      <tr style="border-bottom:1.5px solid #e2e8f0; color:#64748b; font-size:11px; text-transform:uppercase; background:#f8fafc;">
+                        <th style="padding:6px; text-align:left;">Nguyên Liệu Trực Tiếp</th>
+                        <th style="padding:6px; text-align:right; width:135px;">Định Lượng/ Ly</th>
+                        <th style="padding:6px; text-align:right; width:100px;">Chi Phí/ Ly</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recipe.groups.raw.map(item => `
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                          <td style="padding:7px 6px;">
+                            <span style="font-weight:600; color:#1e293b;">${item.name}</span>
+                          </td>
+                          <td style="width:135px; text-align:right; padding:7px 6px;">
+                            <span style="font-weight:700; color:#16a34a;">${item.qty} ${item.unit}</span>
+                            <div style="font-size:11px; color:#64748b;">(Giá gốc: ${item.price.toFixed(1)} đ/${item.unit})</div>
+                          </td>
+                          <td style="width:100px; text-align:right; font-weight:700; color:#0f172a; padding:7px 6px;">
+                            ${Math.round(item.qty * item.price).toLocaleString('vi-VN')} đ
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="ing-group">
+                <div class="ing-group-header">
+                  <span class="ing-group-title g3">📦 3. Vật Tư Bao Bì Ly Nắp & Ống Hút:</span>
+                  <span style="font-size:12px; font-weight:700; color:#64748b;">Tiểu kế: ${totPkg.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div class="table-responsive-wrapper">
+                  <table class="data-table" style="width:100%; min-width:320px; font-size:12.5px; border-collapse:collapse;">
+                    <thead>
+                      <tr style="border-bottom:1.5px solid #e2e8f0; color:#64748b; font-size:11px; text-transform:uppercase; background:#f8fafc;">
+                        <th style="padding:6px; text-align:left;">Vật Tư Ly Nắp & Ống Hút</th>
+                        <th style="padding:6px; text-align:right; width:135px;">Định Lượng/ Ly</th>
+                        <th style="padding:6px; text-align:right; width:100px;">Chi Phí/ Ly</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recipe.groups.pkg.map(item => `
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                          <td style="padding:7px 6px;">
+                            <span style="font-weight:600; color:#1e293b;">${item.name}</span>
+                          </td>
+                          <td style="width:135px; text-align:right; padding:7px 6px;">
+                            <span style="font-weight:700; color:#ea580c;">${item.qty} ${item.unit}</span>
+                            <div style="font-size:11px; color:#64748b;">(Đơn giá: ${item.price.toFixed(0)} đ/${item.unit})</div>
+                          </td>
+                          <td style="width:100px; text-align:right; font-weight:700; color:#0f172a; padding:7px 6px;">
+                            ${Math.round(item.qty * item.price).toLocaleString('vi-VN')} đ
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="cost-report-sidebar">
+                <div style="font-size:11px; font-weight:800; color:#64748b; text-align:center; text-transform:uppercase; margin-bottom:10px;">
+                  CƠ CẤU GIÁ VỐN & LỢI NHUẬN
+                </div>
+                
+                <div class="donut-wrap">
+                  <canvas id="donut-canvas-${recipe.id}"></canvas>
+                </div>
+
+                <div style="font-size:11.5px; display:flex; flex-direction:column; gap:4px; margin-bottom:10px;">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>🟢 Bán thành phẩm:</span>
+                    <strong>${totalCost > 0 ? Math.round(totBtp/totalCost*100) : 0}% (${totBtp.toLocaleString('vi-VN')} đ)</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>🟠 Nguyên liệu thô:</span>
+                    <strong>${totalCost > 0 ? Math.round(totRaw/totalCost*100) : 0}% (${totRaw.toLocaleString('vi-VN')} đ)</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>🔵 Bao bì & Ly:</span>
+                    <strong>${totalCost > 0 ? Math.round(totPkg/totalCost*100) : 0}% (${totPkg.toLocaleString('vi-VN')} đ)</strong>
+                  </div>
+                </div>
+
+                <div style="border-top:1px dashed #cbd5e1; padding-top:6px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                    <span style="font-size:11.5px; color:#64748b; font-weight:600;">Tổng Giá Vốn:</span>
+                    <span style="font-size:14px; font-weight:800; color:#b45309;">${totalCost.toLocaleString('vi-VN')} đ</span>
+                  </div>
+                  <div style="font-size:11px; color:#15803d; font-weight:700; margin-bottom:6px;">
+                    Food Cost: ${costPct.toFixed(1)}% (Mục tiêu &lt; 30%)
+                  </div>
+                  <div style="display:flex; justify-content:space-between; padding:4px 0; border-top:1px solid #f1f5f9;">
+                    <span style="font-size:11px; color:#64748b;">Tại Quán (Bán ${Math.round(recipe.salePrice/1000)}k):</span>
+                    <span style="font-size:12.5px; font-weight:800; color:#15803d;">+${profit.toLocaleString('vi-VN')} đ (${marginPct.toFixed(1)}%)</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; padding:4px 0; border-top:1px solid #f1f5f9;">
+                    <span style="font-size:11px; color:#64748b;">App (-25%):</span>
+                    <span style="font-size:12.5px; font-weight:800; color:#0284c7;">+${Math.round(appProfit).toLocaleString('vi-VN')} đ (${appMarginPct.toFixed(1)}%)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="yield-panel-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <strong style="font-size:12px; color:#166534;">🔄 MÁY TÍNH SẢN LƯỢNG LY</strong>
+                  <span style="font-size:9.5px; background:#dcfce7; color:#15803d; padding:2px 5px; border-radius:4px; font-weight:700;">Tự động</span>
+                </div>
+
+                <div class="yield-tab-strip">
+                  <button class="yield-tab-item active" id="ytab-btp-${recipe.id}" onclick="switchYieldTabForRecipe('${recipe.id}', 'btp')">🍵 Mẻ</button>
+                  <button class="yield-tab-item" id="ytab-raw-${recipe.id}" onclick="switchYieldTabForRecipe('${recipe.id}', 'raw')">🥬 Nguyên Liệu</button>
+                  <button class="yield-tab-item" id="ytab-pkg-${recipe.id}" onclick="switchYieldTabForRecipe('${recipe.id}', 'pkg')">📦 Bao Bì</button>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                  <select id="sel-yield-${recipe.id}" class="form-control" style="font-size:12px; padding:5px 6px; flex:1;" onchange="calcYieldForRecipe('${recipe.id}')">
+                  </select>
+                  <input type="number" id="inp-yield-${recipe.id}" class="form-control" style="width:85px; font-size:12px; font-weight:700; text-align:center; padding:5px;" value="1000" oninput="calcYieldForRecipe('${recipe.id}')">
+                  <span id="unit-yield-${recipe.id}" style="font-size:11.5px; font-weight:700; color:#166534; width:30px;">g</span>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                  <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:6px; padding:6px; text-align:center;">
+                    <div style="font-size:16px; font-weight:800; color:#15803d;" id="res-cups-${recipe.id}">~ 0 Ly</div>
+                    <div style="font-size:10px; color:#166534; font-weight:600;">Sản lượng làm ra</div>
+                  </div>
+                  <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:6px; padding:6px; text-align:center;">
+                    <div style="font-size:16px; font-weight:800; color:#b45309;" id="res-cost-${recipe.id}">0 đ</div>
+                    <div style="font-size:10px; color:#166534; font-weight:600;">Tổng vốn mua vào</div>
+                  </div>
+                </div>
+
+                <div id="note-yield-${recipe.id}" style="margin-top:6px; padding:6px; background:#ffffff; border-radius:6px; border:1px dashed #86efac; font-size:10.5px; color:#166534; line-height:1.4;">
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+        container.appendChild(card);
+
+        if (recipe.isExpanded) {
+          setTimeout(() => {
+            initDonutForRecipe(recipe.id, totBtp, totRaw, totPkg);
+            switchYieldTabForRecipe(recipe.id, 'btp');
+          }, 50);
+        }
+      });
+
+      renderDatalistMaster();
+    }
+
+    function toggleRecipeCard(recipeId) {
+      const rec = ALL_RECIPES.find(r => r.id === recipeId);
+      if (!rec) return;
+      rec.isExpanded = !rec.isExpanded;
+      renderAllRecipeCards();
+      saveToLocalStorage();
+    }
+
+    let isAllExpandedState = false;
+    function toggleAllCardsGlobal() {
+      isAllExpandedState = !isAllExpandedState;
+      ALL_RECIPES.forEach(r => r.isExpanded = isAllExpandedState);
+      document.getElementById('btnToggleAllCards').innerText = isAllExpandedState ? '▴ Thu Gọn Tất Cả' : '▾ Mở Rộng Tất Cả';
+      renderAllRecipeCards();
+      saveToLocalStorage();
+    }
+
+    function filterMenuCategory(cat) {
+      currentFilterCat = cat;
+      renderAllRecipeCards();
+    }
+
+    function initDonutForRecipe(recipeId, btp, raw, pkg) {
+      const canvasId = `donut-canvas-${recipeId}`;
+      const canvasEl = document.getElementById(canvasId);
+      if (!canvasEl) return;
+
+      if (chartInstancesMap[recipeId]) {
+        chartInstancesMap[recipeId].destroy();
+      }
+
+      chartInstancesMap[recipeId] = new Chart(canvasEl, {
+        type: 'doughnut',
+        data: {
+          labels: ['BTP', 'Nguyên liệu thô', 'Bao bì'],
+          datasets: [{
+            data: [btp, raw, pkg],
+            backgroundColor: ['#15a802', '#ea580c', '#0284c7'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          cutout: '72%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    let recipeYieldTabsMap = {};
+
+    function switchYieldTabForRecipe(recipeId, tab) {
+      recipeYieldTabsMap[recipeId] = tab;
+      const rec = ALL_RECIPES.find(r => r.id === recipeId);
+      if (!rec) return;
+
+      ['btp', 'raw', 'pkg'].forEach(t => {
+        const btn = document.getElementById(`ytab-${t}-${recipeId}`);
+        if (btn) {
+          if (t === tab) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+
+      const sel = document.getElementById(`sel-yield-${recipeId}`);
+      if (!sel) return;
+      sel.innerHTML = '';
+
+      const items = rec.groups[tab] || [];
+      if (items.length === 0) {
+        sel.innerHTML = '<option value="-1">(Không có)</option>';
+        calcYieldForRecipe(recipeId);
+        return;
+      }
+
+      items.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.innerText = item.name;
+        sel.appendChild(opt);
+      });
+
+      const first = items[0];
+      const defaultQty = first.unit === 'cái' ? 50 : 1000;
+      document.getElementById(`inp-yield-${recipeId}`).value = defaultQty;
+      document.getElementById(`unit-yield-${recipeId}`).innerText = first.unit;
+      calcYieldForRecipe(recipeId);
+    }
+
+    function calcYieldForRecipe(recipeId) {
+      const rec = ALL_RECIPES.find(r => r.id === recipeId);
+      if (!rec) return;
+      const tab = recipeYieldTabsMap[recipeId] || 'btp';
+      const items = rec.groups[tab] || [];
+      const selIdx = parseInt(document.getElementById(`sel-yield-${recipeId}`)?.value);
+      const item = items[selIdx];
+
+      const resCupsEl = document.getElementById(`res-cups-${recipeId}`);
+      const resCostEl = document.getElementById(`res-cost-${recipeId}`);
+      const noteEl = document.getElementById(`note-yield-${recipeId}`);
+      if (!resCupsEl || !resCostEl || !noteEl) return;
+
+      if (!item) {
+        resCupsEl.innerText = '0 Ly';
+        resCostEl.innerText = '0 đ';
+        noteEl.innerHTML = 'Chưa chọn nguyên liệu.';
+        return;
+      }
+
+      const inputQty = parseFloat(document.getElementById(`inp-yield-${recipeId}`).value) || 0;
+      document.getElementById(`unit-yield-${recipeId}`).innerText = item.unit;
+
+      const qtyPerCup = item.qty || 1;
+      const cups = qtyPerCup > 0 ? Math.floor(inputQty / qtyPerCup) : 0;
+      const costPerCup = Math.round(qtyPerCup * item.price);
+
+      let totalPurchaseCost = Math.round(inputQty * item.price);
+      let note = '';
+
+      if (tab === 'btp') {
+        const batch = BATCH_DETAILS_MAP[item.name];
+        if (batch && batch.outputQty > 0) {
+          let batchRawCost = 0;
+          batch.ingredients.forEach(i => batchRawCost += (i.qty * i.price));
+          totalPurchaseCost = Math.round(inputQty * (batchRawCost / batch.outputQty));
+          note = `💡 <strong>Mẻ BTP:</strong> Dùng ${qtyPerCup}${item.unit}/ly. Nhập/nấu <strong>${inputQty.toLocaleString('vi-VN')}${item.unit}</strong> (vốn: <strong>${totalPurchaseCost.toLocaleString('vi-VN')} đ</strong>) = <strong>${cups} ly</strong> (Định mức: <strong>${costPerCup.toLocaleString('vi-VN')} đ/ly</strong>).`;
+        } else {
+          note = `💡 Mỗi ly dùng <strong>${qtyPerCup}${item.unit}</strong>. Nhập <strong>${inputQty.toLocaleString('vi-VN')}${item.unit}</strong> (vốn: <strong>${totalPurchaseCost.toLocaleString('vi-VN')} đ</strong>) = <strong>${cups} ly</strong>.`;
+        }
+      } else {
+        note = `💡 Mỗi ly dùng <strong>${qtyPerCup}${item.unit}</strong> (đơn giá: ${item.price} đ/${item.unit}). Mua <strong>${inputQty.toLocaleString('vi-VN')}${item.unit}</strong> (vốn: <strong>${totalPurchaseCost.toLocaleString('vi-VN')} đ</strong>) làm được <strong>${cups} ly</strong> (Định mức: <strong>${costPerCup.toLocaleString('vi-VN')} đ/ly</strong>).`;
+      }
+
+      resCupsEl.innerText = `~ ${cups} Ly`;
+      resCostEl.innerText = `${totalPurchaseCost.toLocaleString('vi-VN')} đ`;
+      noteEl.innerHTML = note;
+    }
+
+
+    /* =========================================================================
+     * MODULE 5: MODAL TẠO & SỬA MÓN (AUTO-PRICE 100%)
+     * ========================================================================= */
+    let activeEditingRecipeId = null;
+
+    function openNewRecipeModal() {
+      activeEditingRecipeId = null;
+      document.getElementById('modalRecipeFormTitle').innerHTML = `
+        <img src="img/bfresh_logo_official.jpg" alt="BFresh" style="width:24px; height:24px; border-radius:50%; border:1px solid #15a802;">
+        Tạo Món Mới Menu & Định Lượng Giá Vốn
+      `;
+      document.getElementById('inputNewRecipeName').value = "Trà Xanh Hoa Nhài Kem Cheese (Size M)";
+      document.getElementById('selectRecipeGroupDropdown').value = "Trà Sữa";
+      document.getElementById('selectRecipeSizeDropdown').value = "Size M (500ml)";
+      document.getElementById('inputNewRecipePrice').value = "39000";
+
+      const btpBox = document.getElementById('boxNewRecipeBtp');
+      btpBox.innerHTML = '';
+      createAutoPriceRowElement('btp', 'Nước Cốt Trà Lài Pha Trái Cây (Mẻ 1.2L)', 150, btpBox);
+
+      const rawBox = document.getElementById('boxNewRecipeRaw');
+      rawBox.innerHTML = '';
+      createAutoPriceRowElement('raw', 'Bột kem béo', 20, rawBox);
+      createAutoPriceRowElement('raw', 'Sữa đặc', 20, rawBox);
+
+      const pkgBox = document.getElementById('boxNewRecipePkg');
+      pkgBox.innerHTML = '';
+      createAutoPriceRowElement('pkg', 'Ly nhựa PP 500ml', 1, pkgBox);
+      createAutoPriceRowElement('pkg', 'Nắp tim đen', 1, pkgBox);
+      createAutoPriceRowElement('pkg', 'Ống hút phi 12', 1, pkgBox);
+
+      calcNewRecipeCostAndMargin();
+      document.getElementById('modalNewRecipeDialog').classList.add('open');
+    }
+
+    function openEditRecipeById(recipeId) {
+      activeEditingRecipeId = recipeId;
+      const rec = ALL_RECIPES.find(r => r.id === recipeId);
+      if (!rec) return;
+
+      document.getElementById('modalRecipeFormTitle').innerHTML = `
+        <img src="img/bfresh_logo_official.jpg" alt="BFresh" style="width:24px; height:24px; border-radius:50%; border:1px solid #15a802;">
+        Chỉnh Sửa Món: ${rec.name}
+      `;
+      document.getElementById('inputNewRecipeName').value = rec.name;
+      document.getElementById('selectRecipeGroupDropdown').value = rec.category;
+      document.getElementById('selectRecipeSizeDropdown').value = rec.size;
+      document.getElementById('inputNewRecipePrice').value = rec.salePrice;
+
+      const btpBox = document.getElementById('boxNewRecipeBtp');
+      btpBox.innerHTML = '';
+      rec.groups.btp.forEach(i => createAutoPriceRowElement('btp', i.name, i.qty, btpBox));
+
+      const rawBox = document.getElementById('boxNewRecipeRaw');
+      rawBox.innerHTML = '';
+      rec.groups.raw.forEach(i => createAutoPriceRowElement('raw', i.name, i.qty, rawBox));
+
+      const pkgBox = document.getElementById('boxNewRecipePkg');
+      pkgBox.innerHTML = '';
+      rec.groups.pkg.forEach(i => createAutoPriceRowElement('pkg', i.name, i.qty, pkgBox));
+
+      calcNewRecipeCostAndMargin();
+      document.getElementById('modalNewRecipeDialog').classList.add('open');
+    }
+
+    function closeNewRecipeModal() {
+      document.getElementById('modalNewRecipeDialog').classList.remove('open');
+    }
+
+    function createAutoPriceRowElement(cat, name, qty, container) {
+      const row = document.createElement('div');
+      row.className = 'recipe-modal-row';
+
+      let unitPrice = 0;
+      let unit = (cat === 'btp' ? 'ml' : (cat === 'raw' ? 'g' : 'cái'));
+
+      if (cat === 'btp') {
+        const bPrice = getBatchUnitPrice(name);
+        if (bPrice) { unitPrice = bPrice.price; unit = bPrice.unit; }
+      } else {
+        const mPrice = getMasterIngredientPrice(name);
+        if (mPrice) { unitPrice = mPrice.price; unit = mPrice.unit; }
+      }
+
+      const cost = Math.round(qty * unitPrice);
+
+      row.innerHTML = `
+        <div style="flex:1; width:100%;">
+          <input type="text" list="datalistMasterIngredients" class="form-control row-ing-name" style="padding:4px 8px; font-weight:600; font-size:12px;" value="${name}" placeholder="Chọn nguyên liệu..." onchange="handleIngredientChangeAutoPrice(this, '${cat}')">
+        </div>
+        <div class="row-part-grid">
+          <input type="number" class="form-control row-ing-qty" style="padding:4px 6px; font-weight:700; text-align:center; font-size:12.5px; border-color:#15803d; width:75px;" value="${qty}" oninput="calcNewRecipeCostAndMargin()" placeholder="SL">
+          <input type="text" class="form-control row-ing-unit" style="padding:4px 4px; text-align:center; font-size:12px; background:#f8fafc; width:50px;" value="${unit}" readonly>
+          <input type="number" class="form-control row-ing-price input-autofill-unit-price" style="padding:4px 6px; text-align:right; font-size:12px; flex:1; min-width:65px;" value="${unitPrice}" readonly title="Đơn giá tự động quy đổi từ Bảng Giá">
+          <div style="text-align:right; font-weight:800; color:#0f172a; font-size:12.5px; min-width:75px;" class="row-ing-total">
+            ${cost.toLocaleString('vi-VN')} đ
+          </div>
+          <div>
+            <button type="button" onclick="this.closest('.recipe-modal-row').remove(); calcNewRecipeCostAndMargin();" style="border:none; background:#fee2e2; color:#ef4444; border-radius:4px; padding:3px 8px; cursor:pointer; font-weight:bold;">✕</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    function addNewRecipeRowDynamic(cat) {
+      let box = cat === 'btp' ? document.getElementById('boxNewRecipeBtp') : (cat === 'raw' ? document.getElementById('boxNewRecipeRaw') : document.getElementById('boxNewRecipePkg'));
+      let defaultName = cat === 'btp' ? 'Nước Cốt Trà Olong Nướng (Mẻ 1.1L)' : (cat === 'raw' ? 'Cam Vàng Mỹ / Cam Sành Tươi' : 'Ly nhựa PP 500ml');
+      let defaultQty = cat === 'btp' ? 100 : (cat === 'raw' ? 20 : 1);
+
+      createAutoPriceRowElement(cat, defaultName, defaultQty, box);
+      calcNewRecipeCostAndMargin();
+    }
+
+    function handleIngredientChangeAutoPrice(inputEl, cat) {
+      const name = inputEl.value.trim();
+      const row = inputEl.closest('.recipe-modal-row');
+      if (!row) return;
+
+      let foundPrice = null;
+      if (cat === 'btp') {
+        foundPrice = getBatchUnitPrice(name);
+      } else {
+        foundPrice = getMasterIngredientPrice(name);
+      }
+
+      if (foundPrice) {
+        row.querySelector('.row-ing-price').value = foundPrice.price;
+        row.querySelector('.row-ing-unit').value = foundPrice.unit;
+        row.querySelector('.row-ing-price').setAttribute('readonly', 'true');
+        row.querySelector('.row-ing-price').classList.add('input-autofill-unit-price');
+      } else {
+        row.querySelector('.row-ing-price').removeAttribute('readonly');
+        row.querySelector('.row-ing-price').classList.remove('input-autofill-unit-price');
+      }
+
+      calcNewRecipeCostAndMargin();
+    }
+
+    function calcNewRecipeCostAndMargin() {
+      let totalCost = 0;
+      document.querySelectorAll('#modalNewRecipeDialog .recipe-modal-row').forEach(row => {
+        const qty = parseFloat(row.querySelector('.row-ing-qty')?.value) || 0;
+        const price = parseFloat(row.querySelector('.row-ing-price')?.value) || 0;
+        const rowCost = Math.round(qty * price);
+        const totEl = row.querySelector('.row-ing-total');
+        if (totEl) totEl.innerText = rowCost.toLocaleString('vi-VN') + ' đ';
+        totalCost += rowCost;
+      });
+
+      const saleP = parseFloat(document.getElementById('inputNewRecipePrice')?.value) || 0;
+      const profit = saleP - totalCost;
+      const marginPct = saleP > 0 ? (profit / saleP * 100) : 0;
+
+      document.getElementById('labelNewRecCost').innerText = totalCost.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('labelNewRecMargin').innerText = marginPct.toFixed(1) + '%';
+    }
+
+    function saveNewRecipeSubmit() {
+      const name = document.getElementById('inputNewRecipeName').value.trim();
+      if (!name) { alert('Vui lòng nhập tên món!'); return; }
+
+      const group = document.getElementById('selectRecipeGroupDropdown').value.trim() || 'Trà Sữa';
+      const size = document.getElementById('selectRecipeSizeDropdown').value.trim() || 'Size M (500ml)';
+      const salePrice = parseFloat(document.getElementById('inputNewRecipePrice').value) || 0;
+
+      const readGroupRows = (boxId, isBtp) => {
+        const arr = [];
+        document.querySelectorAll(`#${boxId} .recipe-modal-row`).forEach(r => {
+          arr.push({
+            name: r.querySelector('.row-ing-name').value.trim(),
+            qty: parseFloat(r.querySelector('.row-ing-qty').value) || 0,
+            unit: r.querySelector('.row-ing-unit').value.trim() || 'g',
+            price: parseFloat(r.querySelector('.row-ing-price').value) || 0,
+            isBtp: isBtp
+          });
+        });
+        return arr;
+      };
+
+      const btpItems = readGroupRows('boxNewRecipeBtp', true);
+      const rawItems = readGroupRows('boxNewRecipeRaw', false);
+      const pkgItems = readGroupRows('boxNewRecipePkg', false);
+
+      if (activeEditingRecipeId) {
+        const idx = ALL_RECIPES.findIndex(r => r.id === activeEditingRecipeId);
+        if (idx !== -1) {
+          ALL_RECIPES[idx] = {
+            ...ALL_RECIPES[idx],
+            name: name,
+            category: group,
+            size: size,
+            salePrice: salePrice,
+            groups: { btp: btpItems, raw: rawItems, pkg: pkgItems }
+          };
+        }
+      } else {
+        ALL_RECIPES.unshift({
+          id: 'rec_' + Date.now(),
+          name: name,
+          category: group,
+          size: size,
+          salePrice: salePrice,
+          isExpanded: true,
+          groups: { btp: btpItems, raw: rawItems, pkg: pkgItems }
+        });
+      }
+
+      saveToLocalStorage();
+      alert(`✅ ĐÃ LƯU THÀNH CÔNG:\n- Món: ${name}\n- Nhóm: ${group}\n- Size: ${size}\n- Giá bán: ${salePrice.toLocaleString('vi-VN')} đ\nDữ liệu đã được lưu vĩnh viễn trên máy!`);
+      closeNewRecipeModal();
+      renderAllRecipeCards();
+    }
+
+    function deleteRecipeById(recipeId) {
+      const rec = ALL_RECIPES.find(r => r.id === recipeId);
+      if (!rec) return;
+      if (confirm(`Bạn có chắc muốn xóa món "${rec.name}" khỏi Menu?`)) {
+        ALL_RECIPES = ALL_RECIPES.filter(r => r.id !== recipeId);
+        saveToLocalStorage();
+        renderAllRecipeCards();
+      }
+    }
+
+
+    /* =========================================================================
+     * MODULE 6: CẤU THÀNH BTP (MẺ)
+     * ========================================================================= */
+    let activeEditingBatchName = '';
+
+    function openBtpModal(title, recipeName = '', recipeQty = null, recipeUnit = '', recipePrice = null) {
+      activeEditingBatchName = title;
+      document.getElementById('modalBtpHeaderTitle').innerText = 'Cấu Thành Mẻ: ' + title;
+
+      if (!BATCH_DETAILS_MAP[title]) {
+        BATCH_DETAILS_MAP[title] = {
+          id: 'btp_' + Date.now(),
+          name: title,
+          outputQty: 1000,
+          unit: 'ml',
+          expireHours: 4,
+          ingredients: [
+            { name: 'Nguyên liệu thô A', qty: 50, unit: 'g', price: 100, total: 5000 }
+          ]
+        };
+      }
+
+      const batch = BATCH_DETAILS_MAP[title];
+      document.getElementById('btpOutputQty').value = batch.outputQty;
+      document.getElementById('labelBtpOutputUnit').innerText = batch.unit;
+      document.getElementById('btpExpireHours').value = batch.expireHours || 4;
+
+      // Hiển thị thông báo giải thích tương quan giữa Cả mẻ và Định lượng 1 ly nước
+      const noticeEl = document.getElementById('btpModalContextNotice');
+      if (noticeEl) {
+        if (recipeName && recipeQty !== null) {
+          const unitP = (recipePrice !== null) ? recipePrice : 0;
+          const totalCostForCup = Math.round(recipeQty * unitP);
+          noticeEl.innerHTML = `
+            <div style="font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+              <span>💡 PHÂN BIỆT GIỮA CẢ MẺ VÀ 1 LY NƯỚC (F&B LOGIC):</span>
+            </div>
+            <div style="line-height:1.6;">
+              • <strong>CẢ MẺ NẤU (Bên dưới):</strong> Là công thức nấu cốt số lượng lớn, thu được <strong>${batch.outputQty.toLocaleString('vi-VN')} ${batch.unit}</strong> cốt thành phẩm với chi phí vốn cả mẻ.<br>
+              • <strong>MÓN "${recipeName.toUpperCase()}":</strong> Mỗi ly chỉ múc <strong>${recipeQty} ${recipeUnit}</strong> cốt từ mẻ này vào 1 ly ➔ Chi phí tính vào 1 ly là: <strong>${recipeQty} ${recipeUnit} × ${unitP.toFixed(1)} đ = ${totalCostForCup.toLocaleString('vi-VN')} đ/ly</strong>.<br>
+              <span style="color:#475569; font-style:italic;">(📌 Ghi chú: Nếu muốn đổi lượng múc ${recipeQty} ${recipeUnit} này vào ly, bạn hãy bấm nút <strong>"✏️ Sửa Món"</strong> trên thẻ món đó)</span>.
+            </div>
+          `;
+          noticeEl.style.display = 'block';
+        } else {
+          noticeEl.innerHTML = `
+            <div style="font-weight:800; color:#0369a1; margin-bottom:4px;">💡 CÔNG THỨC MẺ BÁN THÀNH PHẨM (BTP):</div>
+            <div>Đây là công thức nấu 1 mẻ lớn (cốt trà, trân châu, sốt, kem...). Khi bạn điều chỉnh sản lượng hoặc nguyên liệu, đơn giá cốt sẽ tự động cập nhật vào toàn bộ các món sử dụng mẻ này trong Menu.</div>
+          `;
+          noticeEl.style.display = 'block';
+        }
+      }
+
+      const tbody = document.getElementById('btpModalRowsTbody');
+      tbody.innerHTML = '';
+
+      batch.ingredients.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <input type="text" list="datalistMasterIngredients" class="form-control btp-row-name" style="padding:4px 8px; font-weight:700;" value="${item.name}" onchange="handleBtpRowIngredientChange(this)">
+          </td>
+          <td>
+            <input type="number" class="form-control btp-row-q" style="padding:4px 8px;" value="${item.qty}" oninput="recalculateBtpBatch()">
+          </td>
+          <td>
+            <input type="text" class="form-control btp-row-u" style="padding:4px 6px; width:50px; text-align:center; background:#f8fafc;" value="${item.unit}" readonly>
+          </td>
+          <td>
+            <input type="number" class="form-control btp-row-p input-autofill-unit-price" style="padding:4px 8px; font-weight:600;" value="${item.price}" readonly>
+          </td>
+          <td>
+            <strong class="btp-row-tot">${item.total.toLocaleString('vi-VN')} đ</strong>
+          </td>
+          <td>
+            <button type="button" onclick="this.closest('tr').remove(); recalculateBtpBatch();" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:bold; font-size:14px;">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      recalculateBtpBatch();
+      document.getElementById('modalBtpConfig').classList.add('open');
+    }
+
+    function closeBtpModal() {
+      document.getElementById('modalBtpConfig').classList.remove('open');
+    }
+
+    function addBtpRowDynamic() {
+      const tbody = document.getElementById('btpModalRowsTbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <input type="text" list="datalistMasterIngredients" class="form-control btp-row-name" style="padding:4px 8px; font-weight:700;" placeholder="Chọn nguyên liệu..." onchange="handleBtpRowIngredientChange(this)">
+        </td>
+        <td>
+          <input type="number" class="form-control btp-row-q" style="padding:4px 8px;" value="50" oninput="recalculateBtpBatch()">
+        </td>
+        <td>
+          <input type="text" class="form-control btp-row-u" style="padding:4px 6px; width:50px; text-align:center; background:#f8fafc;" value="g" readonly>
+        </td>
+        <td>
+          <input type="number" class="form-control btp-row-p input-autofill-unit-price" style="padding:4px 8px; font-weight:600;" value="100" readonly>
+        </td>
+        <td>
+          <strong class="btp-row-tot">5.000 đ</strong>
+        </td>
+        <td>
+          <button type="button" onclick="this.closest('tr').remove(); recalculateBtpBatch();" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:bold; font-size:14px;">✕</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      recalculateBtpBatch();
+    }
+
+    function handleBtpRowIngredientChange(inputEl) {
+      const val = inputEl.value.trim();
+      const p = getMasterIngredientPrice(val);
+      const row = inputEl.closest('tr');
+      if (p && row) {
+        row.querySelector('.btp-row-p').value = p.price;
+        row.querySelector('.btp-row-u').value = p.unit;
+      }
+      recalculateBtpBatch();
+    }
+
+    function recalculateBtpBatch() {
+      let totalBatchCost = 0;
+      document.querySelectorAll('#btpModalRowsTbody tr').forEach(r => {
+        const q = parseFloat(r.querySelector('.btp-row-q')?.value) || 0;
+        const p = parseFloat(r.querySelector('.btp-row-p')?.value) || 0;
+        const cost = Math.round(q * p);
+        const totEl = r.querySelector('.btp-row-tot');
+        if (totEl) totEl.innerText = cost.toLocaleString('vi-VN') + ' đ';
+        totalBatchCost += cost;
+      });
+
+      const outQty = parseFloat(document.getElementById('btpOutputQty')?.value) || 1000;
+      const unitCost = outQty > 0 ? (totalBatchCost / outQty) : 0;
+      const outUnit = document.getElementById('labelBtpOutputUnit').innerText;
+
+      document.getElementById('labelBtpTotalBatch').innerText = `${totalBatchCost.toLocaleString('vi-VN')} đ / ${outQty.toLocaleString('vi-VN')} ${outUnit}`;
+      document.getElementById('labelBtpUnitCost').innerText = `${unitCost.toFixed(2)} đ / ${outUnit}`;
+    }
+
+    function saveBtpBatchChanges() {
+      if (!activeEditingBatchName) return;
+
+      const outQty = parseFloat(document.getElementById('btpOutputQty')?.value) || 1000;
+      const expireH = parseFloat(document.getElementById('btpExpireHours')?.value) || 4;
+      const unit = document.getElementById('labelBtpOutputUnit').innerText;
+
+      const newIngredients = [];
+      let totalBatchCost = 0;
+
+      document.querySelectorAll('#btpModalRowsTbody tr').forEach(r => {
+        const name = r.querySelector('.btp-row-name')?.value.trim() || 'Nguyên liệu';
+        const q = parseFloat(r.querySelector('.btp-row-q')?.value) || 0;
+        const u = r.querySelector('.btp-row-u')?.value.trim() || 'g';
+        const p = parseFloat(r.querySelector('.btp-row-p')?.value) || 0;
+        const cost = Math.round(q * p);
+        totalBatchCost += cost;
+        newIngredients.push({ name, qty: q, unit: u, price: p, total: cost });
+      });
+
+      BATCH_DETAILS_MAP[activeEditingBatchName] = {
+        name: activeEditingBatchName,
+        outputQty: outQty,
+        unit: unit,
+        expireHours: expireH,
+        ingredients: newIngredients
+      };
+
+      const newUnitCost = outQty > 0 ? (totalBatchCost / outQty) : 0;
+
+      ALL_RECIPES.forEach(rec => {
+        rec.groups.btp.forEach(item => {
+          if (item.name === activeEditingBatchName) {
+            item.price = Math.round(newUnitCost * 10) / 10;
+          }
+        });
+      });
+
+      saveToLocalStorage();
+      alert(`✅ ĐÃ LƯU CẤU THÀNH MẺ THÀNH CÔNG:\n- Mẻ: ${activeEditingBatchName}\n- Đơn giá cốt: ${newUnitCost.toFixed(2)} đ/${unit}\nĐã lưu vĩnh viễn và tự động đồng bộ vào toàn bộ Menu!`);
+      closeBtpModal();
+      renderAllRecipeCards();
+    }
+
+
+    /* =========================================================================
+     * MODULE 7: BẢNG GIÁ NGUYÊN LIỆU ĐẦU VÀO & NẠP FILE CSV/EXCEL THÔNG MINH
+     * ========================================================================= */
+    function openPriceListModal() {
+      renderPriceListTable();
+      document.getElementById('modalPriceListDialog').classList.add('open');
+    }
+
+    function closePriceListModal() {
+      document.getElementById('modalPriceListDialog').classList.remove('open');
+    }
+
+    function renderPriceListTable() {
+      const tbody = document.getElementById('tbodyPriceList');
+      tbody.innerHTML = '';
+
+      MASTER_INGREDIENTS.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f1f5f9';
+        tr.innerHTML = `
+          <td>
+            <input type="text" class="form-control pl-name" style="padding:4px 8px; font-weight:700; font-size:12.5px;" value="${item.name}">
+          </td>
+          <td>
+            <input type="text" list="datalistCategories" class="form-control pl-cat combobox-input" style="padding:4px 6px; font-size:12px;" value="${item.cat}">
+          </td>
+          <td>
+            <input type="text" list="datalistUnits" class="form-control pl-unit combobox-input" style="padding:4px 6px; font-size:12px;" value="${item.buyUnit}">
+          </td>
+          <td>
+            <input type="number" class="form-control pl-price" style="padding:4px 8px; font-weight:700; text-align:right; font-size:12.5px;" value="${item.buyPrice}" oninput="handlePriceRowInput(this, ${item.ratio}, '${item.baseUnit}')">
+          </td>
+          <td>
+            <span style="color:#15803d; font-weight:700;" class="pl-base-display">${item.basePrice.toLocaleString('vi-VN')} đ/${item.baseUnit}</span>
+          </td>
+          <td>
+            <button type="button" onclick="this.closest('tr').remove()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:bold; font-size:14px;">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handlePriceRowInput(inputEl, ratio, baseUnit) {
+      const p = parseFloat(inputEl.value) || 0;
+      const baseP = ratio > 0 ? (p / ratio) : p;
+      const row = inputEl.closest('tr');
+      if (row) {
+        row.querySelector('.pl-base-display').innerText = `${baseP.toFixed(1)} đ/${baseUnit}`;
+      }
+    }
+
+    function addNewManualIngredientRow() {
+      const tbody = document.getElementById('tbodyPriceList');
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #f1f5f9';
+      tr.innerHTML = `
+        <td>
+          <input type="text" class="form-control pl-name" style="padding:4px 8px; font-weight:700; font-size:12.5px;" placeholder="Tên nguyên liệu mới...">
+        </td>
+        <td>
+          <input type="text" list="datalistCategories" class="form-control pl-cat combobox-input" style="padding:4px 6px; font-size:12px;" value="Trái Cây Tươi">
+        </td>
+        <td>
+          <input type="text" list="datalistUnits" class="form-control pl-unit combobox-input" style="padding:4px 6px; font-size:12px;" value="kg">
+        </td>
+        <td>
+          <input type="number" class="form-control pl-price" style="padding:4px 8px; font-weight:700; text-align:right; font-size:12.5px;" value="50000" oninput="this.closest('tr').querySelector('.pl-base-display').innerText = (this.value / 1000).toFixed(1) + ' đ/g'">
+        </td>
+        <td>
+          <span style="color:#15803d; font-weight:700;" class="pl-base-display">50 đ/g</span>
+        </td>
+        <td>
+          <button type="button" onclick="this.closest('tr').remove()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:bold; font-size:14px;">✕</button>
+        </td>
+      `;
+      tbody.prepend(tr);
+    }
+
+    function savePriceListChanges() {
+      const newMaster = [];
+      document.querySelectorAll('#tbodyPriceList tr').forEach(r => {
+        const name = r.querySelector('.pl-name')?.value.trim();
+        if (!name) return;
+        const cat = r.querySelector('.pl-cat')?.value.trim() || 'Khác';
+        const buyUnit = r.querySelector('.pl-unit')?.value.trim() || 'kg';
+        const buyPrice = parseFloat(r.querySelector('.pl-price')?.value) || 0;
+
+        const conv = smartCalculateBasePrice(buyUnit, '', buyPrice);
+
+        newMaster.push({
+          id: 'nl_' + Date.now() + Math.random().toString(36).substr(2, 4),
+          name: name,
+          cat: cat,
+          buyUnit: buyUnit,
+          buyPrice: buyPrice,
+          baseUnit: conv.baseUnit,
+          ratio: conv.ratio,
+          basePrice: conv.basePrice
+        });
+      });
+
+      MASTER_INGREDIENTS = newMaster;
+
+      // Đồng bộ giá mới vào các món đang có trong menu
+      syncPriceFromMasterToAllRecipes();
+
+      saveToLocalStorage();
+      alert(`✅ ĐÃ LƯU BẢNG GIÁ THÀNH CÔNG:\nĐã lưu ${MASTER_INGREDIENTS.length} nguyên liệu vĩnh viễn vào hệ thống.`);
+      closePriceListModal();
+      renderAllRecipeCards();
+    }
+
+    function syncPriceFromMasterToAllRecipes() {
+      // 1. Đồng bộ giá nguyên liệu mới vào các Mẻ BTP (Batches)
+      Object.keys(BATCH_DETAILS_MAP).forEach(k => {
+        const batch = BATCH_DETAILS_MAP[k];
+        let totBatchCost = 0;
+        batch.ingredients.forEach(ing => {
+          const m = getMasterIngredientPrice(ing.name);
+          if (m) ing.price = m.price;
+          ing.total = Math.round(ing.qty * ing.price);
+          totBatchCost += ing.total;
+        });
+      });
+
+      // 2. Đồng bộ giá Mẻ BTP, Nguyên liệu trực tiếp và Bao bì vào tất cả các Món
+      ALL_RECIPES.forEach(rec => {
+        rec.groups.btp.forEach(item => {
+          const bp = getBatchUnitPrice(item.name);
+          if (bp) item.price = bp.price;
+        });
+        rec.groups.raw.forEach(item => {
+          const m = getMasterIngredientPrice(item.name);
+          if (m) item.price = m.price;
+        });
+        rec.groups.pkg.forEach(item => {
+          const m = getMasterIngredientPrice(item.name);
+          if (m) item.price = m.price;
+        });
+      });
+    }
+
+    function renderDatalistMaster() {
+      const dl = document.getElementById('datalistMasterIngredients');
+      dl.innerHTML = '';
+      MASTER_INGREDIENTS.forEach(i => {
+        const opt = document.createElement('option');
+        opt.value = i.name;
+        opt.label = `${i.cat} - ${i.basePrice.toLocaleString('vi-VN')} đ/${i.baseUnit}`;
+        dl.appendChild(opt);
+      });
+      Object.keys(BATCH_DETAILS_MAP).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.label = `Mẻ BTP`;
+        dl.appendChild(opt);
+      });
+    }
+
+    function downloadPriceTemplateCSV() {
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+        + "Tên nguyên liệu,Danh mục,Đơn vị mua,Giá nhập,Quy đổi đơn vị\n"
+        + "Bột kem béo,Sữa & Bột,kg,78000,1000g\n"
+        + "Sữa tươi không đường,Sữa & Bột,hộp 1l,35000,1000ml\n"
+        + "Sữa đặc,Sữa & Bột,hộp 1280g,65000,1280g\n"
+        + "Cam vàng tươi,Trái Cây Tươi,kg,42000,1000g\n"
+        + "Siro đào,Siro & Sốt,chai 700ml,95000,700ml\n"
+        + "Ly nhựa PP 500ml,Bao Bì,cái,850,1cai\n";
+
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", "mau_nguyen_lieu_chuan_BFresh.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    let currentPriceImportMode = 'replace'; // 'replace' | 'append'
+
+    function triggerImportPriceFileDialog(mode) {
+      currentPriceImportMode = mode || 'replace';
+      document.getElementById('fileInputPriceImport').click();
+    }
+
+    function handleImportPriceFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const isReplaceAll = (currentPriceImportMode === 'replace');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          let rows = [];
+          const isExcel = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+
+          if (isExcel && typeof XLSX !== 'undefined') {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+          } else {
+            let text = '';
+            if (typeof e.target.result === 'string') {
+              text = e.target.result;
+            } else {
+              text = new TextDecoder('utf-8').decode(e.target.result);
+            }
+            rows = text.split(/\r?\n/).map(l => {
+              let cols = l.split(',');
+              if (cols.length < 3) cols = l.split('\t');
+              if (cols.length < 3) cols = l.split(';');
+              return cols;
+            });
+          }
+
+          if (rows.length <= 1) {
+            alert("⚠️ File không có dữ liệu hợp lệ!");
+            return;
+          }
+
+          const importedList = [];
+          for (let i = 1; i < rows.length; i++) {
+            const cols = rows[i];
+            if (!cols || cols.length < 3) continue;
+
+            const name = String(cols[0] || '').trim().replace(/^["']|["']$/g, '');
+            const cat = String(cols[1] || '').trim().replace(/^["']|["']$/g, '') || 'Khác';
+            const buyUnit = String(cols[2] || '').trim().replace(/^["']|["']$/g, '') || 'kg';
+            const buyPrice = parseFloat(String(cols[3] || '0').replace(/[^0-9.]/g, '')) || 0;
+            const convertCol = String(cols[4] || '').trim().replace(/^["']|["']$/g, '');
+
+            if (name && buyPrice > 0) {
+              const conv = smartCalculateBasePrice(buyUnit, convertCol, buyPrice);
+              importedList.push({
+                id: 'nl_imp_' + Date.now() + i,
+                name: name,
+                cat: cat,
+                buyUnit: buyUnit,
+                buyPrice: buyPrice,
+                baseUnit: conv.baseUnit,
+                ratio: conv.ratio,
+                basePrice: conv.basePrice
+              });
+            }
+          }
+
+          if (importedList.length === 0) {
+            alert("⚠️ Không tìm thấy nguyên liệu hợp lệ trong file!");
+            return;
+          }
+
+          if (isReplaceAll) {
+            MASTER_INGREDIENTS = importedList;
+          } else {
+            // Nạp bổ sung: nếu trùng tên thì cập nhật giá mới; nếu mới thì thêm vào
+            importedList.forEach(imp => {
+              const exIdx = MASTER_INGREDIENTS.findIndex(m => m.name.toLowerCase().trim() === imp.name.toLowerCase().trim());
+              if (exIdx !== -1) {
+                MASTER_INGREDIENTS[exIdx] = imp;
+              } else {
+                MASTER_INGREDIENTS.push(imp);
+              }
+            });
+          }
+
+          syncPriceFromMasterToAllRecipes();
+          saveToLocalStorage();
+
+          alert(`🎉 NẠP THÀNH CÔNG!\n- Đã nạp ${importedList.length} nguyên liệu từ file "${file.name}".\n- Chế độ: ${isReplaceAll ? 'NẠP MỚI 100% (Ghi đè)' : 'NẠP BỔ SUNG (Cập nhật & Thêm mới)'}.\n- Toàn bộ giá vốn và lãi gộp đã được tự động tính toán lại!`);
+          renderPriceListTable();
+          renderAllRecipeCards();
+        } catch (err) {
+          alert("Lỗi khi xử lý file giá: " + err.message);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+      event.target.value = ''; // Reset input
+    }
+
+
+    /* =========================================================================
+     * MODULE 8: QUẢN LÝ SAO LƯU & PHỤC HỒI (BACKUP & RESTORE JSON)
+     * ========================================================================= */
+    function openBackupRestoreModal() {
+      document.getElementById('modalBackupRestoreDialog').classList.add('open');
+    }
+
+    function closeBackupRestoreModal() {
+      document.getElementById('modalBackupRestoreDialog').classList.remove('open');
+    }
+
+    function exportSystemBackupJSON() {
+      const backupData = {
+        app: "BFRESH_STATION_COST_CALCULATOR",
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        note: "File sao lưu toàn bộ Bảng giá, Mẻ BTP và Công thức món của BFresh Station",
+        masterIngredients: MASTER_INGREDIENTS,
+        batchDetailsMap: BATCH_DETAILS_MAP,
+        allRecipes: ALL_RECIPES
+      };
+
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `BFresh_Cost_Backup_${dateStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleRestoreJSONFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.masterIngredients || !data.allRecipes) {
+            alert("⚠️ File sao lưu không hợp lệ hoặc sai cấu trúc!");
+            return;
+          }
+
+          if (confirm(`Bạn có chắc muốn phục hồi dữ liệu từ file "${file.name}"?\n(Dữ liệu hiện tại trên máy sẽ được thay thế bằng dữ liệu trong file này).`)) {
+            MASTER_INGREDIENTS = data.masterIngredients;
+            if (data.batchDetailsMap) BATCH_DETAILS_MAP = data.batchDetailsMap;
+            ALL_RECIPES = data.allRecipes;
+
+            saveToLocalStorage();
+            alert(`🎉 PHỤC HỒI THÀNH CÔNG!\nĐã nạp ${MASTER_INGREDIENTS.length} nguyên liệu và ${ALL_RECIPES.length} món menu.`);
+            closeBackupRestoreModal();
+            renderAllRecipeCards();
+          }
+        } catch (err) {
+          alert("Lỗi khi đọc file JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function resetToDefaultDataTemplate() {
+      if (confirm("⚠️ BẠN CÓ CHẮC MUỐN ĐẶT LẠI TOÀN BỘ VỀ MẪU GỐC BAN ĐẦU?\n(Mọi nguyên liệu bạn tự thêm sẽ bị đặt lại về ban đầu).")) {
+        localStorage.removeItem(STORAGE_KEY);
+        MASTER_INGREDIENTS = JSON.parse(JSON.stringify(DEFAULT_MASTER_INGREDIENTS));
+        saveToLocalStorage();
+        alert("✅ Đã khôi phục lại mẫu gốc thành công!");
+        closeBackupRestoreModal();
+        renderAllRecipeCards();
+      }
+    }
+
+
+    /* =========================================================================
+     * MODULE 9: NẠP CÔNG THỨC MENU ĐỊNH LƯỢNG BẰNG FILE CSV / EXCEL TEMPLATE
+     * ========================================================================= */
+    function openImportRecipeModal() {
+      document.getElementById('modalImportRecipeDialog').classList.add('open');
+    }
+
+    function closeImportRecipeModal() {
+      document.getElementById('modalImportRecipeDialog').classList.remove('open');
+    }
+
+    let currentRecipeImportMode = 'replace'; // 'replace' | 'append'
+
+    function triggerImportRecipeFileDialog(mode) {
+      currentRecipeImportMode = mode || 'replace';
+      document.getElementById('fileInputRecipeImport').click();
+    }
+
+    // 1. Tải về file mẫu định lượng chuẩn (Trực tiếp từ file BFresh_Mau_Cong_Thuc_Dinh_Luong_Chuan.csv)
+    function downloadRecipeTemplateCSV() {
+      const link = document.createElement("a");
+      link.setAttribute("href", "BFresh_Mau_Cong_Thuc_Dinh_Luong_Chuan.csv");
+      link.setAttribute("download", "BFresh_Mau_Cong_Thuc_Dinh_Luong_Chuan.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 2. Nạp và phân tích file công thức định lượng (Hỗ trợ Excel .xlsx, .xls, .csv - Cả cấu trúc Thẻ Khối R&D & Flat CSV)
+    function handleImportRecipeFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const isReplaceAll = (currentRecipeImportMode === 'replace');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          let rows = [];
+          if (typeof XLSX !== 'undefined') {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const wsName = wb.SheetNames[0];
+            const ws = wb.Sheets[wsName];
+            rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+          } else {
+            // Fallback UTF-8 text decoder nếu chưa có XLSX
+            const decoder = new TextDecoder('utf-8');
+            const text = decoder.decode(e.target.result);
+            rows = text.split(/\r?\n/).map(l => l.split(','));
+          }
+
+          if (!rows || rows.length < 2) {
+            alert("⚠️ File không có dữ liệu nội dung hợp lệ!");
+            return;
+          }
+
+          // Kiểm tra xem file có cấu trúc Thẻ Khối R&D ([MẺ] hoặc [MÓN]) hay không
+          const isCardBlock = rows.some(r => r && r[0] && (/\[MẺ\]|\[ME\]|\[MÓN\]|\[MON\]/i.test(String(r[0]))));
+
+          let parsedDishes = [];
+          let parsedBatches = {};
+
+          if (isCardBlock) {
+            // CƠ CHẾ 1: PARSER CẤU TRÚC THẺ KHỐI R&D (CHUẨN 1 SHEET CHUYÊN NGHIỆP)
+            let currentSection = null; // 'batch' | 'dish'
+            let currentItem = null;
+
+            for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              if (!row || row.length === 0) continue;
+              const col0 = String(row[0] || '').trim();
+
+              // Nhận diện Header Thẻ Mẻ
+              if (/\[MẺ\]|\[ME\]/i.test(col0)) {
+                const batchName = col0.replace(/^.*?\[(MẺ|ME)\]\s*/i, '').trim();
+                let outputQty = 1000;
+                let unit = 'ml';
+                let expireHours = 6;
+
+                if (i + 1 < rows.length) {
+                  const metaRow = String(rows[i + 1][0] || '');
+                  const outMatch = metaRow.match(/Sản lượng.*?:?\s*([0-9.]+)\s*([a-zA-Z]+)?/i);
+                  if (outMatch) {
+                    outputQty = parseFloat(outMatch[1]) || 1000;
+                    if (outMatch[2]) unit = outMatch[2].toLowerCase();
+                  }
+                  const expMatch = metaRow.match(/Hạn sử dụng.*?:?\s*([0-9.]+)/i);
+                  if (expMatch) expireHours = parseFloat(expMatch[1]) || 6;
+                }
+
+                currentItem = {
+                  id: 'btp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                  name: batchName,
+                  outputQty: outputQty,
+                  unit: unit,
+                  expireHours: expireHours,
+                  ingredients: []
+                };
+                parsedBatches[batchName] = currentItem;
+                currentSection = 'batch';
+                i += 2; // Bỏ qua dòng thông tin meta và dòng tiêu đề cột
+                continue;
+              }
+
+              // Nhận diện Header Thẻ Món
+              if (/\[MÓN\]|\[MON\]/i.test(col0)) {
+                const dishName = col0.replace(/^.*?\[(MÓN|MON)\]\s*/i, '').trim();
+                let category = 'Trà Trái Cây';
+                let size = 'Size L';
+                let salePrice = 35000;
+
+                if (i + 1 < rows.length) {
+                  const metaRow = String(rows[i + 1][0] || '');
+                  const catMatch = metaRow.match(/Danh Mục:\s*([^|]+)/i);
+                  if (catMatch) category = catMatch[1].trim();
+                  const sizeMatch = metaRow.match(/Size Ly:\s*([^|]+)/i);
+                  if (sizeMatch) size = sizeMatch[1].trim();
+                  const priceMatch = metaRow.match(/Giá Bán.*?:\s*([0-9.,]+)/i);
+                  if (priceMatch) salePrice = parseFloat(priceMatch[1].replace(/[^0-9]/g, '')) || 0;
+                }
+
+                currentItem = {
+                  id: 'rec_imp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                  name: dishName,
+                  category: category,
+                  size: size,
+                  salePrice: salePrice,
+                  isExpanded: (parsedDishes.length < 2),
+                  groups: { btp: [], raw: [], pkg: [] }
+                };
+                parsedDishes.push(currentItem);
+                currentSection = 'dish';
+                i += 2; // Bỏ qua dòng thông tin meta và dòng tiêu đề cột
+                continue;
+              }
+
+              // Dòng trống kết thúc 1 bảng thành phần
+              if (!col0 && !row[1] && !row[2]) {
+                currentSection = null;
+                currentItem = null;
+                continue;
+              }
+
+              // Bỏ qua các dòng phân cách tiêu đề lớn (Phần 1, Phần 2, Lưu ý...)
+              if (/^PHẦN\s+\d+/i.test(col0) || /^💡/i.test(col0) || /^BFRESH/i.test(col0)) {
+                currentSection = null;
+                currentItem = null;
+                continue;
+              }
+
+              // Đọc chi tiết các dòng nguyên liệu
+              if (currentSection === 'batch' && currentItem) {
+                const ingName = col0;
+                const qty = parseFloat(String(row[1] || '0').replace(/[^0-9.]/g, '')) || 0;
+                const unit = String(row[2] || 'g').trim();
+                const note = String(row[4] || '').trim();
+
+                if (ingName && qty > 0) {
+                  const mi = getMasterIngredientPrice(ingName);
+                  const price = mi ? mi.price : 0;
+                  currentItem.ingredients.push({
+                    name: ingName,
+                    qty: qty,
+                    unit: mi ? mi.unit : unit,
+                    price: price,
+                    note: note
+                  });
+                }
+              } else if (currentSection === 'dish' && currentItem) {
+                const ingName = col0;
+                const qty = parseFloat(String(row[1] || '0').replace(/[^0-9.]/g, '')) || 0;
+                const unit = String(row[2] || '').trim();
+                const groupType = String(row[3] || '').trim().toLowerCase();
+                const note = String(row[4] || '').trim();
+
+                if (ingName && qty > 0) {
+                  let gKey = 'raw';
+                  let price = 0;
+                  let finalUnit = unit;
+
+                  if (groupType.includes('mẻ') || groupType.includes('btp') || groupType.includes('cốt')) {
+                    gKey = 'btp';
+                    // Tra cứu giá mẻ trong các mẻ vừa nạp hoặc trong hệ thống
+                    let bPrice = null;
+                    if (parsedBatches[ingName]) {
+                      const b = parsedBatches[ingName];
+                      let tot = 0;
+                      b.ingredients.forEach(i => tot += (i.qty * (i.price || 0)));
+                      bPrice = { price: b.outputQty > 0 ? (tot / b.outputQty) : 0, unit: b.unit };
+                    } else {
+                      bPrice = getBatchUnitPrice(ingName);
+                    }
+                    if (bPrice) {
+                      price = bPrice.price;
+                      finalUnit = bPrice.unit;
+                    }
+                  } else if (groupType.includes('bao') || groupType.includes('ly') || groupType.includes('vật tư') || groupType.includes('pkg')) {
+                    gKey = 'pkg';
+                    const mi = getMasterIngredientPrice(ingName);
+                    if (mi) {
+                      price = mi.price;
+                      finalUnit = mi.unit;
+                    } else {
+                      finalUnit = finalUnit || 'cái';
+                    }
+                  } else {
+                    gKey = 'raw';
+                    const mi = getMasterIngredientPrice(ingName);
+                    if (mi) {
+                      price = mi.price;
+                      finalUnit = mi.unit;
+                    } else {
+                      finalUnit = finalUnit || 'g';
+                    }
+                  }
+
+                  currentItem.groups[gKey].push({
+                    name: ingName,
+                    qty: qty,
+                    unit: finalUnit,
+                    price: price,
+                    note: note
+                  });
+                }
+              }
+            }
+
+            // Lưu các mẻ bán thành phẩm vào BATCH_DETAILS_MAP
+            if (Object.keys(parsedBatches).length > 0) {
+              if (isReplaceAll) {
+                BATCH_DETAILS_MAP = parsedBatches;
+              } else {
+                Object.assign(BATCH_DETAILS_MAP, parsedBatches);
+              }
+            }
+
+          } else {
+            // CƠ CHẾ 2: PARSER BẢNG PHẲNG CSV TRUYỀN THỐNG (FLAT CSV)
+            const dishMap = new Map();
+            for (let i = 1; i < rows.length; i++) {
+              let cols = rows[i];
+              if (typeof cols === 'string') cols = cols.split(',');
+              if (cols && cols.length >= 6) {
+                const dishName = String(cols[0] || '').trim().replace(/^["']|["']$/g, '');
+                const category = String(cols[1] || '').trim().replace(/^["']|["']$/g, '') || 'Khác';
+                const size = String(cols[2] || '').trim().replace(/^["']|["']$/g, '') || 'Size M';
+                const salePrice = parseFloat(String(cols[3] || '0').replace(/[^0-9.]/g, '')) || 0;
+                const groupType = String(cols[4] || '').trim().replace(/^["']|["']$/g, '') || 'Nguyên Liệu';
+                const ingName = String(cols[5] || '').trim().replace(/^["']|["']$/g, '');
+                const qty = parseFloat(String(cols[6] || '0').replace(/[^0-9.]/g, '')) || 0;
+
+                if (!dishName || !ingName) continue;
+
+                const dishKey = `${dishName.toLowerCase()}___${size.toLowerCase()}`;
+                if (!dishMap.has(dishKey)) {
+                  dishMap.set(dishKey, {
+                    id: 'rec_imp_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                    name: dishName,
+                    category: category,
+                    size: size,
+                    salePrice: salePrice,
+                    isExpanded: false,
+                    groups: { btp: [], raw: [], pkg: [] }
+                  });
+                }
+
+                const dish = dishMap.get(dishKey);
+                if (salePrice > 0) dish.salePrice = salePrice;
+                if (category && category !== 'Khác') dish.category = category;
+
+                const gLower = groupType.toLowerCase();
+                let groupKey = 'raw';
+                let unit = 'g';
+                let price = 0;
+
+                if (gLower.includes('mẻ') || gLower.includes('btp') || gLower.includes('cốt')) {
+                  groupKey = 'btp';
+                  const bp = getBatchUnitPrice(ingName);
+                  if (bp) { unit = bp.unit; price = bp.price; } else { unit = 'ml'; price = 0; }
+                } else if (gLower.includes('bao') || gLower.includes('ly') || gLower.includes('vật tư') || gLower.includes('pkg')) {
+                  groupKey = 'pkg';
+                  const mi = getMasterIngredientPrice(ingName);
+                  if (mi) { unit = mi.unit; price = mi.price; } else { unit = 'cái'; price = 0; }
+                } else {
+                  groupKey = 'raw';
+                  const mi = getMasterIngredientPrice(ingName);
+                  if (mi) { unit = mi.unit; price = mi.price; } else { unit = 'g'; price = 0; }
+                }
+
+                dish.groups[groupKey].push({
+                  name: ingName,
+                  qty: qty,
+                  unit: unit,
+                  price: price
+                });
+              }
+            }
+            parsedDishes = Array.from(dishMap.values());
+          }
+
+          if (parsedDishes.length === 0 && Object.keys(parsedBatches).length === 0) {
+            alert("⚠️ Không trích xuất được món hoặc mẻ nào từ file! Vui lòng kiểm tra lại cấu trúc file Excel/CSV theo mẫu chuẩn.");
+            return;
+          }
+
+          if (isReplaceAll) {
+            ALL_RECIPES = parsedDishes;
+          } else {
+            parsedDishes.forEach(newDish => {
+              const exIdx = ALL_RECIPES.findIndex(r => r.name.toLowerCase().trim() === newDish.name.toLowerCase().trim() && r.size.toLowerCase().trim() === newDish.size.toLowerCase().trim());
+              if (exIdx !== -1) {
+                ALL_RECIPES[exIdx] = newDish;
+              } else {
+                ALL_RECIPES.push(newDish);
+              }
+            });
+          }
+
+          // Luôn đồng bộ lại toàn bộ giá một lần nữa để bảo đảm mọi công thức đều có giá chuẩn
+          syncPriceFromMasterToAllRecipes();
+          renderDatalistMaster();
+
+          // Mặc định 2 món đầu tiên mở chi tiết, các món sau thu gọn
+          ALL_RECIPES.forEach((r, idx) => {
+            r.isExpanded = (idx < 2);
+          });
+
+          saveToLocalStorage();
+          closeImportRecipeModal();
+          renderCategoryFilterTabs();
+          renderAllRecipeCards();
+
+          const batchCount = Object.keys(parsedBatches).length;
+          alert(`🎉 NẠP CÔNG THỨC MENU THÀNH CÔNG!\n- Đã nạp ${parsedDishes.length} món ${batchCount > 0 ? `và ${batchCount} Mẻ BTP` : ''} từ file "${file.name}".\n- Chế độ: ${isReplaceAll ? 'NẠP MỚI 100% (Xóa cũ, ghi đè toàn bộ)' : 'NẠP BỔ SUNG (Trùng giữ nguyên, cập nhật thay đổi & thêm mới)'}.\n- Toàn bộ giá vốn, Cost% và định lượng đã được tính toán tự động dựa trên Bảng Giá Gốc!`);
+        } catch (err) {
+          console.error("Lỗi khi xử lý file công thức:", err);
+          alert("Lỗi khi xử lý file công thức: " + err.message);
+        }
+      };
+
+      // Đọc file dưới dạng nhị phân ArrayBuffer (SheetJS hỗ trợ hoàn hảo cả .xlsx, .xls, .csv UTF-8)
+      reader.readAsArrayBuffer(file);
+      event.target.value = '';
+    }
+
+
+    function scrollToTopMenu() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* =========================================================================
+     * KHỞI CHẠY LẦN ĐẦU KHI MỞ TRANG
+     * ========================================================================= */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Tải dữ liệu lưu bền vững từ LocalStorage nếu có
+      loadFromLocalStorage();
+      renderAllRecipeCards();
+    });
+  </script>
+
+  <!-- ================= THANH ĐIỀU HƯỚNG DƯỚI ĐÁY NATIVE ANDROID ================= -->
+  <nav class="mobile-bottom-nav">
+    <button class="mobile-nav-item active" onclick="scrollToTopMenu()">
+      <span class="mobile-nav-icon">📋</span>
+      <span class="mobile-nav-label">Menu Món</span>
+    </button>
+    <button class="mobile-nav-item" onclick="openPriceListModal()">
+      <span class="mobile-nav-icon">🏷️</span>
+      <span class="mobile-nav-label">Bảng Giá</span>
+    </button>
+    <button class="mobile-nav-item mobile-nav-item-fab" onclick="openNewRecipeModal()">
+      <div class="mobile-nav-fab-btn">+</div>
+      <span class="mobile-nav-label">Tạo Món</span>
+    </button>
+    <button class="mobile-nav-item" onclick="openImportRecipeModal()">
+      <span class="mobile-nav-icon">📥</span>
+      <span class="mobile-nav-label">Nạp File</span>
+    </button>
+    <button class="mobile-nav-item" onclick="openBackupRestoreModal()">
+      <span class="mobile-nav-icon">💾</span>
+      <span class="mobile-nav-label">Sao Lưu</span>
+    </button>
+  </nav>
+</body>
+</html>
