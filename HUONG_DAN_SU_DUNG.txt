@@ -1,0 +1,23 @@
+========================================================================
+   BFRESH STATION - HỆ THỐNG ĐỊNH LƯỢNG CHI PHÍ GIÁ VỐN F&B
+========================================================================
+
+1. CÁCH DÙNG TRÊN MỌI MÁY TÍNH (OFFLINE 100%):
+- Giải nén file ZIP này ra một thư mục bất kỳ.
+- Bấm đúp vào "MO_UNG_DUNG.bat" hoặc "index.html".
+- Ứng dụng sẽ tự động mở trên trình duyệt (Chrome, Cốc Cốc, Edge).
+- KHÔNG CẦN CÀI ĐẶT PHẦN MỀM LẬP TRÌNH, KHÔNG CẦN MẠNG INTERNET.
+
+2. LINK DÙNG TRỰC TIẾP TRÊN TRÌNH DUYỆT (ONLINE):
+- Bạn có thể gửi link này cho bất kỳ ai mở trên máy tính hoặc điện thoại:
+  👉 https://teamproject-v1-hub.github.io/bfresh-cost-calculator/
+
+3. DỮ LIỆU ĐÃ ĐÓNG BĂNG & SAO LƯU:
+- File "BFresh_He_Thong_Dinh_Luong_Backup_Chuan.json" chứa:
+  * 35 nguyên liệu chuẩn
+  * 5 mẻ BTP chuẩn R&D
+  * 7 công thức món Menu mẫu
+  * Thuật toán tính Food Cost % và Lợi nhuận gộp
+- Khi đổi máy hoặc muốn khôi phục:
+  Bấm nút "💾 Sao Lưu & Phục Hồi" trên giao diện -> Chọn file JSON này để nạp lại.
+========================================================================
